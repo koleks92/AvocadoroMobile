@@ -20,5 +20,7 @@ It's a mobile version of [**Avocadoro**](https://github.com/koleks92/Avocadoro)
 
 
 ## Development build EAS Local
+- Android
 ```eas build --platform android --profile development --local```
+- iOS
 ```eas build --platform ios --profile development --local```
