@@ -18,6 +18,8 @@ It's a mobile version of [**Avocadoro**](https://github.com/koleks92/Avocadoro)
    npx expo start
    ```
 
+## Testing
+
 
 ## Development build EAS Local
 - Android
