@@ -1,6 +1,9 @@
+import Button from "@/components/UI/Button";
 import { textDefault } from "@/constants/Styles";
 import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+
+
 
 export default function Dashboard() {
     const router = useRouter();

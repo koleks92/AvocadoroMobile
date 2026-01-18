@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { Button, Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { textDefault } from "@/constants/Styles";
+import Button from "@/components/UI/Button";
 
 export default function Settings() {
     const router = useRouter();

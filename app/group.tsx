@@ -1,14 +1,13 @@
+import Button from "@/components/UI/Button";
 import { textDefault } from "@/constants/Styles";
 import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function Group() {
     const router = useRouter();
 
     return (
-        <View
-            style={styles.root}
-        >
+        <View style={styles.root}>
             <Button
                 title="Go back"
                 onPress={() => {
