@@ -1,7 +1,7 @@
-import { Button, Pressable, Text, View } from "react-native";
 import { useRouter } from "expo-router";
+import { Button, Text, View } from "react-native";
 
-export default function Index() {
+export default function AddGroup() {
     const router = useRouter();
 
     return (
@@ -12,13 +12,13 @@ export default function Index() {
                 alignItems: "center",
             }}
         >
-            <Text>Login</Text>
             <Button
-                title="Dashboard"
+                title="Go back"
                 onPress={() => {
-                    router.navigate("/dashboard");
+                    router.back();
                 }}
             />
+            <Text>Add Group.</Text>
         </View>
     );
 }
