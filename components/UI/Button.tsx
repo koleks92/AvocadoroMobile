@@ -2,9 +2,10 @@ import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
 import { Pressable, StyleSheet, Text } from "react-native";
+import { ReactNode } from 'react';
 
 interface ButtonProps {
-    title: string;
+    title: string | ReactNode;
     onPress: () => void;
 }
 
@@ -25,6 +26,8 @@ export default function Button({ title, onPress }: ButtonProps) {
 const styles = StyleSheet.create({
     root: {
         display: "flex",
+        justifyContent: 'center',
+        alignContent: 'center',
         backgroundColor: Colors.primaryGreen,
         borderRadius: Sizes.buttonBorderRadius,
         padding: Sizes.buttonPadding,
