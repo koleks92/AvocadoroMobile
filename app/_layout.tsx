@@ -8,7 +8,10 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
     const [loaded] = useFonts({
-        Montserrat: require("../assets/fonts/Montserrat-VariableFont_wght.ttf"),
+        MontserratRegular: require("../assets/fonts/Montserrat-Regular.ttf"),
+        MontserratItalic: require("../assets/fonts/Montserrat-Italic.ttf"),
+        MontserratBold: require("../assets/fonts/Montserrat-Bold.ttf"),
+        MontserratSemiBold: require("../assets/fonts/Montserrat-SemiBold.ttf"),
     });
 
     useEffect(() => {
@@ -21,7 +24,14 @@ export default function RootLayout() {
         return null;
     }
 
-    return <Stack screenOptions={{ headerShown: false, contentStyle: {
-      backgroundColor: Colors.background1,
-    }}} />;
+    return (
+        <Stack
+            screenOptions={{
+                headerShown: false,
+                contentStyle: {
+                    backgroundColor: Colors.background1,
+                },
+            }}
+        />
+    );
 }
