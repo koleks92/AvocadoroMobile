@@ -15,7 +15,7 @@ export default function Dashboard() {
             <Button
                 title="Log out"
                 onPress={() => {
-                    router.navigate("/dashboard");
+                    router.navigate("/");
                 }}
             />
             <Text>Dashboard.</Text>
