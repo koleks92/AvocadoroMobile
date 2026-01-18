@@ -1,23 +1,40 @@
 import Button from "@/components/UI/Button";
-import { Colors } from "@/constants/Colors";
+import { textDefault } from "@/constants/Styles";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
-import { textDefault } from "@/constants/Styles";
 
 export default function Index() {
     const router = useRouter();
 
+    const googleSignIn = async (): Promise<void> => {
+        console.log("TODO");
+    };
+
+    const appleSignIn = async (): Promise<void> => {
+        console.log("TODO");
+    };
+
     return (
-        <View
-            style={styles.root}
-        >
+        <View style={styles.root}>
             <Text style={styles.text}>Login</Text>
-            <Button
-                title="Dashboard"
-                onPress={() => {
-                    router.navigate("/dashboard");
-                }}
-            />
+            <View>
+                <Button
+                    title="Log In"
+                    onPress={() => {
+                        router.navigate("/dashboard");
+                    }}
+                />
+            </View>
+            <View style={styles.socialView}>
+                <Button
+                    title="Google"
+                    onPress={() => googleSignIn()}
+                />
+                <Button
+                    title="Apple"
+                    onPress={() => appleSignIn()}
+                />
+            </View>
         </View>
     );
 }
@@ -29,6 +46,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     text: {
-      ...textDefault
+        ...textDefault,
+    },
+    socialView: {
+      display: "flex",
+      flexDirection: "row"
     }
 });
