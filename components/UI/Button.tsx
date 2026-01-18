@@ -24,6 +24,7 @@ export default function Button({ title, onPress }: ButtonProps) {
 
 const styles = StyleSheet.create({
     root: {
+        display: "flex",
         backgroundColor: Colors.primaryGreen,
         borderRadius: Sizes.buttonBorderRadius,
         padding: Sizes.buttonPadding,
