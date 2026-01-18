@@ -1,18 +1,17 @@
-import { Button, Pressable, Text, View } from "react-native";
+import Button from "@/components/UI/Button";
+import { Colors } from "@/constants/Colors";
 import { useRouter } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
+import { textDefault } from "@/constants/Styles";
 
 export default function Index() {
     const router = useRouter();
 
     return (
         <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
+            style={styles.root}
         >
-            <Text>Login</Text>
+            <Text style={styles.text}>Login</Text>
             <Button
                 title="Dashboard"
                 onPress={() => {
@@ -22,3 +21,14 @@ export default function Index() {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    text: {
+      ...textDefault
+    }
+});

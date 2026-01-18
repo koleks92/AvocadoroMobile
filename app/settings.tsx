@@ -1,16 +1,13 @@
 import { useRouter } from "expo-router";
-import { Button, Text, View } from "react-native";
+import { Button, Text, View, StyleSheet } from "react-native";
+import { textDefault } from "@/constants/Styles";
 
 export default function Settings() {
     const router = useRouter();
 
     return (
         <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
+            style={styles.root}
         >
             <Button
                 title="Go back"
@@ -18,7 +15,18 @@ export default function Settings() {
                     router.back();
                 }}
             />
-            <Text>Settings.</Text>
+            <Text style={styles.text}>Settings.</Text>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    text: {
+        ...textDefault,
+    },
+});

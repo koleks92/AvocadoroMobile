@@ -1,16 +1,13 @@
+import { textDefault } from "@/constants/Styles";
 import { useRouter } from "expo-router";
-import { Button, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 
 export default function Group() {
     const router = useRouter();
 
     return (
         <View
-            style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-            }}
+            style={styles.root}
         >
             <Button
                 title="Go back"
@@ -18,7 +15,18 @@ export default function Group() {
                     router.back();
                 }}
             />
-            <Text>Group.</Text>
+            <Text style={styles.text}>Group.</Text>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    text: {
+        ...textDefault,
+    },
+});
