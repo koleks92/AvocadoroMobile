@@ -23,5 +23,9 @@ export const Sizes = {
     inputWidth: windowSize * 0.6,
 
     // Logo
-    loginLogo: windowSize * 0.5
+    loginLogo: windowSize * 0.6,
+
+    // Index/Login
+    dontText: windowSize * 0.04,
+
 };
