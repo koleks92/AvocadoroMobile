@@ -1,5 +1,7 @@
 import Button from "@/components/UI/Button";
+import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -27,13 +29,14 @@ export default function Index() {
             </View>
             <View style={styles.socialView}>
                 <Button
-                    title="Google"
-                    onPress={() => googleSignIn()}
+                    title={
+                        <FontAwesome name="google" size={Sizes.buttonIcon}/>
+                    }
+                    onPress={() => googleSignIn()} icon={true}
                 />
-                <Button
-                    title="Apple"
-                    onPress={() => appleSignIn()}
-                />
+                <Button title={
+                        <FontAwesome name="apple" size={Sizes.buttonIcon}/>
+                    } onPress={() => appleSignIn()} icon={true}/>
             </View>
         </View>
     );
@@ -49,7 +52,7 @@ const styles = StyleSheet.create({
         ...textDefault,
     },
     socialView: {
-      display: "flex",
-      flexDirection: "row"
-    }
+        display: "flex",
+        flexDirection: "row",
+    },
 });
