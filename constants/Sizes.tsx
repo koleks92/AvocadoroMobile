@@ -20,5 +20,8 @@ export const Sizes = {
     inputPadding: windowSize * 0.05,
     inputMargin: windowSize * 0.01,
     inputBorderRadius: windowSize * 0.1,
-    inputWidth: windowSize * 0.6
+    inputWidth: windowSize * 0.6,
+
+    // Logo
+    loginLogo: windowSize * 0.5
 };
