@@ -7,15 +7,17 @@ import { ReactNode } from 'react';
 interface ButtonProps {
     title: string | ReactNode;
     onPress: () => void;
+    icon?: boolean;
 }
 
-export default function Button({ title, onPress }: ButtonProps) {
+export default function Button({ title, onPress, icon }: ButtonProps) {
     return (
         <Pressable
             onPress={onPress}
             style={({ pressed }) => [
                 styles.root,
                 pressed ? styles.pressed : null,
+                icon ? styles.icon : null
             ]}
         >
             <Text style={styles.title}>{title}</Text>
@@ -27,11 +29,14 @@ const styles = StyleSheet.create({
     root: {
         display: "flex",
         justifyContent: 'center',
-        alignContent: 'center',
+        alignItems: 'center',
         backgroundColor: Colors.primaryGreen,
         borderRadius: Sizes.buttonBorderRadius,
         padding: Sizes.buttonPadding,
         margin: Sizes.buttonMargin,
+    },
+    icon: {
+        width: Sizes.buttonIconWidth
     },
     pressed: {
         backgroundColor: Colors.primaryDarkGreen,
@@ -41,4 +46,5 @@ const styles = StyleSheet.create({
         ...textDefault,
         fontSize: Sizes.buttonFont,
     },
+
 });
