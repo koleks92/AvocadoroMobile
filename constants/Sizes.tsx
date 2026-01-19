@@ -7,6 +7,10 @@ const windowHeight = Dimensions.get("window").height;
 const windowSize = windowWidth > windowHeight ? windowHeight : windowWidth;
 
 export const Sizes = {
+    // Root sizes
+    rootMargin: windowSize * 0.04,
+    rootPadding: windowSize * 0.04,
+
     // Button
     buttonFont: windowSize * 0.05,
     buttonIcon: windowSize * 0.08,
