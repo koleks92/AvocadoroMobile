@@ -46,6 +46,7 @@ export default function ShakingLogo() {
 const styles = StyleSheet.create({
     logo: {
         height: Sizes.loginLogo,
+        width: Sizes.loginLogo,
         alignSelf: "center",
     },
 });
