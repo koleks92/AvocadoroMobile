@@ -16,8 +16,8 @@ export const Sizes = {
     buttonMargin: windowSize * 0.01,
 
     // Input
-    inputFont: windowSize * 0.06,
-    inputPadding: windowSize * 0.04,
+    inputFont: windowSize * 0.05,
+    inputPadding: windowSize * 0.05,
     inputMargin: windowSize * 0.01,
     inputBorderRadius: windowSize * 0.1,
     inputWidth: windowSize * 0.6
