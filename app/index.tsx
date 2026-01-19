@@ -1,8 +1,9 @@
 import ShakingLogo from "@/components/UI/AvocadoroImage";
 import Button from "@/components/UI/Button";
 import InputField from "@/components/UI/Input";
+import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
-import { textDefault } from "@/constants/Styles";
+import { rootStyles, textDefault } from "@/constants/Styles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -161,11 +162,7 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
+    root: rootStyles,
     logoView: {
         flex: 2,
         width: "100%",
