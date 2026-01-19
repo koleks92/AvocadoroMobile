@@ -8,6 +8,8 @@ const windowSize = windowWidth > windowHeight ? windowHeight: windowWidth;
 
 export const Sizes = {
     buttonFont: windowSize * 0.06,
+    buttonIcon: windowSize * 0.08,
+    buttonIconWidth: windowSize * 0.16,
     buttonPadding: windowSize * 0.04,
     buttonBorderRadius: windowSize * 0.10,
     buttonMargin: windowSize * 0.01
