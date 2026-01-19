@@ -8,12 +8,16 @@ interface InputProps {
     placeholder: string;
     value: string;
     onChangeText: (text: string) => void;
+    inputMode: "text" | "email";
+    password?: boolean
 }
 
 export default function InputField({
     placeholder,
     value,
-    onChangeText
+    onChangeText,
+    inputMode,
+    password
 }: InputProps) {
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -25,9 +29,11 @@ export default function InputField({
             value={value}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
+            inputMode={inputMode}
+            secureTextEntry={password}
         />
     );
-}
+} 
 
 const styles = StyleSheet.create({
     root: {
