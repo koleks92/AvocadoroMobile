@@ -1,7 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
-import { useIsFocused } from "@react-navigation/native";
 import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 
@@ -14,20 +13,18 @@ interface InputProps {
 export default function InputField({
     placeholder,
     value,
-    onChangeText,
+    onChangeText
 }: InputProps) {
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
     return (
         <TextInput
-            style={[
-                styles.root,
-                isFocused ? styles.focus : null,
-            ]}
+            style={[styles.root, isFocused ? styles.focus : null]}
             placeholder={placeholder}
             onChangeText={onChangeText}
             value={value}
             onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
         />
     );
 }
@@ -46,6 +43,6 @@ const styles = StyleSheet.create({
         width: Sizes.inputWidth,
     },
     focus: {
-        backgroundColor: Colors.primaryDarkGreen
-    }
+        backgroundColor: Colors.primaryDarkGreen,
+    },
 });
