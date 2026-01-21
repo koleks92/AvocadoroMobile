@@ -1,7 +1,7 @@
+import AnimatedRoot from "@/components/UI/AnimatedRoot";
 import ShakingLogo from "@/components/UI/AvocadoroImage";
 import Button from "@/components/UI/Button";
 import InputField from "@/components/UI/Input";
-import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -38,126 +38,129 @@ export default function Index() {
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-        >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.root}>
-                    <View style={styles.logoView}>
-                        {signUpView ? (
-                            <View style={styles.backButtonView}>
-                                <Button
-                                    title={
-                                        <Ionicons
-                                            name="chevron-back"
-                                            size={Sizes.buttonIcon}
-                                        />
-                                    }
-                                    onPress={() => setSignUpView(false)}
-                                    icon={true}
-                                />
-                            </View>
-                        ) : (
-                            <View style={styles.disabledView}>
-                                <Button
-                                    title={
-                                        <Ionicons
-                                            name="chevron-back"
-                                            size={Sizes.buttonIcon}
-                                        />
-                                    }
-                                    onPress={() => setSignUpView(false)}
-                                    icon={true}
-                                />
-                            </View>
-                        )}
-                        <ShakingLogo />
-                    </View>
-                    <View style={styles.mainView}>
-                        <View style={styles.logoInputView}>
-                            <InputField
-                                placeholder="Enter your email"
-                                value={email}
-                                onChangeText={(val) => setEmail(val)}
-                                inputMode="email"
-                            />
-                            <InputField
-                                placeholder="Enter your password"
-                                value={password}
-                                onChangeText={(val) => setPassword(val)}
-                                inputMode="text"
-                                password={true}
-                            />
-                            {signUpView && (
-                                <InputField
-                                    placeholder="Confirm your password"
-                                    value={passwordConfirm}
-                                    onChangeText={(val) =>
-                                        setPasswordConfirm(val)
-                                    }
-                                    inputMode="text"
-                                    password={true}
-                                />
-                            )}
-                        </View>
-                        {signUpView ? (
-                            <View style={styles.buttonsView}>
-                                <Button
-                                    title="Sign Up"
-                                    onPress={() => {
-                                        router.navigate("/dashboard");
-                                    }}
-                                />
-                            </View>
-                        ) : (
-                            <View style={styles.buttonsView}>
-                                <Button
-                                    title="Sign In"
-                                    onPress={() => {
-                                        router.navigate("/dashboard");
-                                    }}
-                                />
-                                <View style={styles.socialView}>
+        <>
+            <AnimatedRoot />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{ flex: 1 }}
+            >
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={styles.root}>
+                        <View style={styles.logoView}>
+                            {signUpView ? (
+                                <View style={styles.backButtonView}>
                                     <Button
                                         title={
-                                            <FontAwesome
-                                                name="google"
+                                            <Ionicons
+                                                name="chevron-back"
                                                 size={Sizes.buttonIcon}
                                             />
                                         }
-                                        onPress={() => googleSignIn()}
-                                        icon={true}
-                                    />
-                                    <Button
-                                        title={
-                                            <FontAwesome
-                                                name="apple"
-                                                size={Sizes.buttonIcon}
-                                            />
-                                        }
-                                        onPress={() => appleSignIn()}
+                                        onPress={() => setSignUpView(false)}
                                         icon={true}
                                     />
                                 </View>
+                            ) : (
+                                <View style={styles.disabledView}>
+                                    <Button
+                                        title={
+                                            <Ionicons
+                                                name="chevron-back"
+                                                size={Sizes.buttonIcon}
+                                            />
+                                        }
+                                        onPress={() => setSignUpView(false)}
+                                        icon={true}
+                                    />
+                                </View>
+                            )}
+                            <ShakingLogo />
+                        </View>
+                        <View style={styles.mainView}>
+                            <View style={styles.logoInputView}>
+                                <InputField
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChangeText={(val) => setEmail(val)}
+                                    inputMode="email"
+                                />
+                                <InputField
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChangeText={(val) => setPassword(val)}
+                                    inputMode="text"
+                                    password={true}
+                                />
+                                {signUpView && (
+                                    <InputField
+                                        placeholder="Confirm your password"
+                                        value={passwordConfirm}
+                                        onChangeText={(val) =>
+                                            setPasswordConfirm(val)
+                                        }
+                                        inputMode="text"
+                                        password={true}
+                                    />
+                                )}
                             </View>
-                        )}
-                        {!signUpView && (
-                            <Pressable
-                                style={styles.dontButton}
-                                onPress={() => {
-                                    setSignUpView(true);
-                                }}
-                            >
-                                <Text style={styles.dontText}>
-                                    Don't have an account yet
-                                </Text>
-                            </Pressable>
-                        )}
+                            {signUpView ? (
+                                <View style={styles.buttonsView}>
+                                    <Button
+                                        title="Sign Up"
+                                        onPress={() => {
+                                            router.navigate("/dashboard");
+                                        }}
+                                    />
+                                </View>
+                            ) : (
+                                <View style={styles.buttonsView}>
+                                    <Button
+                                        title="Sign In"
+                                        onPress={() => {
+                                            router.navigate("/dashboard");
+                                        }}
+                                    />
+                                    <View style={styles.socialView}>
+                                        <Button
+                                            title={
+                                                <FontAwesome
+                                                    name="google"
+                                                    size={Sizes.buttonIcon}
+                                                />
+                                            }
+                                            onPress={() => googleSignIn()}
+                                            icon={true}
+                                        />
+                                        <Button
+                                            title={
+                                                <FontAwesome
+                                                    name="apple"
+                                                    size={Sizes.buttonIcon}
+                                                />
+                                            }
+                                            onPress={() => appleSignIn()}
+                                            icon={true}
+                                        />
+                                    </View>
+                                </View>
+                            )}
+                            {!signUpView && (
+                                <Pressable
+                                    style={styles.dontButton}
+                                    onPress={() => {
+                                        setSignUpView(true);
+                                    }}
+                                >
+                                    <Text style={styles.dontText}>
+                                        Don't have an account yet
+                                    </Text>
+                                </Pressable>
+                            )}
+                        </View>
                     </View>
-                </View>
-            </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+        </>
     );
 }
 
@@ -180,9 +183,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     backButtonView: {
-        display: 'flex',
+        display: "flex",
         width: "100%",
-        alignItems: 'flex-start'
+        alignItems: "flex-start",
     },
     dontText: {
         ...textDefault,
