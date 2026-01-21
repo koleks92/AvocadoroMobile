@@ -34,6 +34,7 @@ export default function RootLayout() {
                         contentStyle: {
                             backgroundColor: Colors.background1,
                         },
+                        animation: "fade",
                     }}
                 />
             </SafeAreaView>
