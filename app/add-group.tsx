@@ -1,5 +1,5 @@
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
-import Button from "@/components/UI/Button";
+import GoBackButton from "@/components/UI/GoBackButton";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
@@ -11,8 +11,7 @@ export default function AddGroup() {
         <>
             <AnimatedRoot />
             <View style={styles.root}>
-                <Button
-                    title="Go back"
+                <GoBackButton
                     onPress={() => {
                         router.back();
                     }}

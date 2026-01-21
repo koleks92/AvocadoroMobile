@@ -1,6 +1,7 @@
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
 import ShakingLogo from "@/components/UI/AvocadoroImage";
 import Button from "@/components/UI/Button";
+import GoBackButton from "@/components/UI/GoBackButton";
 import InputField from "@/components/UI/Input";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
@@ -49,15 +50,8 @@ export default function Index() {
                         <View style={styles.topView}>
                             {signUpView ? (
                                 <View style={styles.backButtonView}>
-                                    <Button
-                                        title={
-                                            <Ionicons
-                                                name="chevron-back"
-                                                size={Sizes.buttonIcon}
-                                            />
-                                        }
+                                    <GoBackButton
                                         onPress={() => setSignUpView(false)}
-                                        icon={true}
                                     />
                                 </View>
                             ) : (
@@ -181,7 +175,7 @@ const styles = StyleSheet.create({
     logoView: {
         flex: 1,
         width: Sizes.loginLogo,
-        height: Sizes.loginLogo
+        height: Sizes.loginLogo,
     },
     logoInputView: {
         display: "flex",
