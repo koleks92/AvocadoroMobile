@@ -15,3 +15,8 @@ export const rootStyles = {
     justifyContent: "center",
     alignItems: "center",
 } as const;
+
+export const animatedRoot = {
+    backgroundColor: Colors.background1,
+    zIndex: 1,
+} as const;
