@@ -14,7 +14,7 @@ export const Sizes = {
     // Button
     buttonFont: windowSize * 0.05,
     buttonIcon: windowSize * 0.08,
-    buttonIconWidth: windowSize * 0.16,
+    buttonIconWidth: windowSize * 0.2,
     buttonPadding: windowSize * 0.04,
     buttonBorderRadius: windowSize * 0.1,
     buttonMargin: windowSize * 0.02,
