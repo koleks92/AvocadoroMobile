@@ -1,4 +1,5 @@
 import { Colors } from "@/constants/Colors";
+import { AvocadoroProvider } from "@/store/AvocadoroContext";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -27,16 +28,20 @@ export default function RootLayout() {
 
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background1}}>
-                <Stack
-                    screenOptions={{
-                        headerShown: false,
-                        contentStyle: {
-                            backgroundColor: Colors.background1,
-                        },
-                        animation: "fade",
-                    }}
-                />
+            <SafeAreaView
+                style={{ flex: 1, backgroundColor: Colors.background1 }}
+            >
+                <AvocadoroProvider>
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                            contentStyle: {
+                                backgroundColor: Colors.background1,
+                            },
+                            animation: "fade",
+                        }}
+                    />
+                </AvocadoroProvider>
             </SafeAreaView>
         </SafeAreaProvider>
     );
