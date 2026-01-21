@@ -46,7 +46,7 @@ export default function Index() {
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.root}>
-                        <View style={styles.logoView}>
+                        <View style={styles.topView}>
                             {signUpView ? (
                                 <View style={styles.backButtonView}>
                                     <Button
@@ -74,7 +74,9 @@ export default function Index() {
                                     />
                                 </View>
                             )}
-                            <ShakingLogo />
+                            <View style={styles.logoView}>
+                                <ShakingLogo />
+                            </View>
                         </View>
                         <View style={styles.mainView}>
                             <View style={styles.logoInputView}>
@@ -166,7 +168,7 @@ export default function Index() {
 
 const styles = StyleSheet.create({
     root: rootStyles,
-    logoView: {
+    topView: {
         flex: 2,
         width: "100%",
         justifyContent: "center",
@@ -175,6 +177,11 @@ const styles = StyleSheet.create({
     mainView: {
         flex: 3,
         alignItems: "center",
+    },
+    logoView: {
+        flex: 1,
+        width: Sizes.loginLogo,
+        height: Sizes.loginLogo
     },
     logoInputView: {
         display: "flex",
