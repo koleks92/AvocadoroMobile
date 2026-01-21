@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Session, SupabaseClient } from "@supabase/supabase-js";
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useEffect, useState, useContext } from "react";
 
 // Define the shape of the context value
 type AvocadoroContextType = {
@@ -10,9 +10,17 @@ type AvocadoroContextType = {
 };
 
 // Create the context (default: null so we can handle initialization)
-export const AvocadoroContext = createContext<AvocadoroContextType | null>(
-    null,
-);
+const AvocadoroContext = createContext<AvocadoroContextType | null>(null);
+
+export function useAvocadoro() {
+    const context = useContext(AvocadoroContext);
+    if (!context) {
+        throw new Error(
+            "useAvocadoro must be used within an AvocadoroProvider",
+        );
+    }
+    return context;
+}
 
 // Define props type for the Provider
 type AvocadoroProviderProps = {
@@ -22,7 +30,6 @@ type AvocadoroProviderProps = {
 // The provider itself
 export function AvocadoroProvider({ children }: AvocadoroProviderProps) {
     const [session, setSession] = useState<Session | null>(null);
-
 
     useEffect(() => {
         supabase.auth
@@ -37,9 +44,7 @@ export function AvocadoroProvider({ children }: AvocadoroProviderProps) {
     }, []);
 
     return (
-        <AvocadoroContext.Provider
-            value={{ supabase, session, setSession }}
-        >
+        <AvocadoroContext.Provider value={{ supabase, session, setSession }}>
             {children}
         </AvocadoroContext.Provider>
     );
