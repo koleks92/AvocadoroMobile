@@ -241,16 +241,18 @@ export default function Index() {
                                             onPress={() => googleSignIn()}
                                             icon={true}
                                         />
-                                        <Button
-                                            title={
-                                                <FontAwesome
-                                                    name="apple"
-                                                    size={Sizes.buttonIcon}
-                                                />
-                                            }
-                                            onPress={() => appleSignIn()}
-                                            icon={true}
-                                        />
+                                        {Platform.OS === "ios" && (
+                                            <Button
+                                                title={
+                                                    <FontAwesome
+                                                        name="apple"
+                                                        size={Sizes.buttonIcon}
+                                                    />
+                                                }
+                                                onPress={() => appleSignIn()}
+                                                icon={true}
+                                            />
+                                        )}
                                     </View>
                                 </View>
                             )}
@@ -316,6 +318,7 @@ const styles = StyleSheet.create({
     socialView: {
         display: "flex",
         flexDirection: "row",
+        justifyContent: "center"
     },
     logo: {
         height: Sizes.loginLogo,
