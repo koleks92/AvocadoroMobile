@@ -5,10 +5,11 @@ import GoBackButton from "@/components/UI/GoBackButton";
 import InputField from "@/components/UI/Input";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import { useAvocadoro } from "@/store/AvocadoroContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Keyboard,
     KeyboardAvoidingView,
@@ -23,12 +24,71 @@ import {
 export default function Index() {
     const router = useRouter();
 
+    const { session, supabase, setSession } = useAvocadoro();
+
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [passwordConfirm, setPasswordConfirm] = useState<string>("");
     const [signUpView, setSignUpView] = useState<boolean>(false);
 
-    const signIn = async (): Promise<void> => {};
+    const [message, setMessage] = useState<string>("");
+    const [emailInvalid, setEmailInvalid] = useState<boolean>(false);
+    const [passwordInvalid,setPasswordInvalid] = useState<boolean>(false);
+
+    const [authLoaded, setAuthLoaded] = useState(false);
+
+    useEffect(() => {
+        // Initial Session Load ---
+        supabase.auth.getSession().then(({ data }) => {
+            setSession(data.session);
+            setAuthLoaded(true); // Initial state resolved
+        });
+
+        // Supabase Real-time Listener ---
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                setSession(session);
+            },
+        );
+
+        return () => listener.subscription.unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        if (session) {
+            router.navigate("/dashboard");
+        }
+    }, [session, authLoaded]);
+
+    const signIn = async (): Promise<void> => {
+        setMessage("");
+
+        // Email validation: must include "@" and "."
+        const emailIsInvalid = !email.includes("@") || !email.includes(".");
+        setEmailInvalid(emailIsInvalid);
+
+        // Password validation:
+        // must be >= 10 characters and contain at least 1 digit
+        const passwordIsInvalid = password.length < 10 || !/\d/.test(password); // \d checks for a digit
+        setPasswordInvalid(passwordIsInvalid);
+
+        if (!emailIsInvalid && !passwordIsInvalid) {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                console.error("Signin error:", error);
+                setMessage(error.message);
+                return;
+            }
+
+            if (data) {
+                console.log("Signin success:", data);
+            }
+        }
+    };
 
     const googleSignIn = async (): Promise<void> => {
         console.log("TODO");
@@ -113,7 +173,7 @@ export default function Index() {
                                     <Button
                                         title="Sign In"
                                         onPress={() => {
-                                            router.navigate("/dashboard");
+                                            signIn();
                                         }}
                                     />
                                     <View style={styles.socialView}>
