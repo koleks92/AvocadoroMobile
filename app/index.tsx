@@ -13,6 +13,7 @@ import {
     isErrorWithCode,
     statusCodes,
 } from "@react-native-google-signin/google-signin";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -39,7 +40,7 @@ export default function Index() {
     const [passwordConfirm, setPasswordConfirm] = useState<string>("");
     const [signUpView, setSignUpView] = useState<boolean>(false);
 
-    const [message, setMessage] = useState<string>("test");
+    const [message, setMessage] = useState<string>("");
     const [emailInvalid, setEmailInvalid] = useState<boolean>(false);
     const [passwordInvalid, setPasswordInvalid] = useState<boolean>(false);
 
@@ -149,7 +150,26 @@ export default function Index() {
     };
 
     const appleSignIn = async (): Promise<void> => {
-        console.log("TODO");
+        try {
+            const response = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                ],
+            });
+
+            if (response?.identityToken) {
+                const { data, error } = await supabase.auth.signInWithIdToken({
+                    provider: "apple",
+                    token: response.identityToken,
+                });
+
+                if (error) {
+                    setMessage("Error occured, please try again :)");
+                }
+            }
+        } catch (error) {
+            setMessage("Error occured, please try again :)");
+        }
     };
 
     return (
@@ -318,7 +338,7 @@ const styles = StyleSheet.create({
     socialView: {
         display: "flex",
         flexDirection: "row",
-        justifyContent: "center"
+        justifyContent: "center",
     },
     logo: {
         height: Sizes.loginLogo,
