@@ -31,6 +31,7 @@ export const Sizes = {
 
     // Index/Login
     dontText: windowSize * 0.04,
-    messageText: windowSize * 0.05,
-    messageMargin: windowSize * 0.03
+    messageText: windowSize * 0.04,
+    messageMargin: windowSize * 0.05,
+    messageMarginTop: windowSize * 0.03
 };

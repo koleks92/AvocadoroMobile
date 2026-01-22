@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
         ...textDefault,
         fontSize: Sizes.messageText,
         textAlign: "center",
+        marginTop: Sizes.messageMarginTop,
         marginHorizontal: Sizes.messageMargin,
         color: "red",
     },
