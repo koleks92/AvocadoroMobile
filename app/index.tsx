@@ -26,6 +26,9 @@ import {
     View,
 } from "react-native";
 
+const webClientId: string = process.env.EXPO_PUBLIC_WEBCLIENT_ID!;
+const iosClientId: string = process.env.EXPO_PUBLIC_IOSCLIENT_ID!;
+
 export default function Index() {
     const router = useRouter();
 
@@ -45,10 +48,8 @@ export default function Index() {
     useEffect(() => {
         // Google signin configuration
         GoogleSignin.configure({
-            webClientId:
-                "341256711027-h3caa7ei82u7niut0odvs2sgp9fmai7m.apps.googleusercontent.com",
-            iosClientId:
-                "341256711027-hheof1hut3om4ele8b134af9ra2kft79.apps.googleusercontent.com",
+            webClientId,
+            iosClientId
         });
 
         // Initial Session Load ---
