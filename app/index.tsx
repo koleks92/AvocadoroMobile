@@ -8,6 +8,11 @@ import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {
+    GoogleSignin,
+    isErrorWithCode,
+    statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -31,13 +36,21 @@ export default function Index() {
     const [passwordConfirm, setPasswordConfirm] = useState<string>("");
     const [signUpView, setSignUpView] = useState<boolean>(false);
 
-    const [message, setMessage] = useState<string>("");
+    const [message, setMessage] = useState<string>("test");
     const [emailInvalid, setEmailInvalid] = useState<boolean>(false);
-    const [passwordInvalid,setPasswordInvalid] = useState<boolean>(false);
+    const [passwordInvalid, setPasswordInvalid] = useState<boolean>(false);
 
     const [authLoaded, setAuthLoaded] = useState(false);
 
     useEffect(() => {
+        // Google signin configuration
+        GoogleSignin.configure({
+            webClientId:
+                "341256711027-h3caa7ei82u7niut0odvs2sgp9fmai7m.apps.googleusercontent.com",
+            iosClientId:
+                "341256711027-hheof1hut3om4ele8b134af9ra2kft79.apps.googleusercontent.com",
+        });
+
         // Initial Session Load ---
         supabase.auth.getSession().then(({ data }) => {
             setSession(data.session);
@@ -60,6 +73,7 @@ export default function Index() {
         }
     }, [session, authLoaded]);
 
+    // Email and password signin
     const signIn = async (): Promise<void> => {
         setMessage("");
 
@@ -90,8 +104,35 @@ export default function Index() {
         }
     };
 
+    // Google signin
     const googleSignIn = async (): Promise<void> => {
-        console.log("TODO");
+        try {
+            await GoogleSignin.hasPlayServices();
+            const response = await GoogleSignin.signIn();
+            if (response.data?.idToken) {
+                const { data, error } = await supabase.auth.signInWithIdToken({
+                    provider: "google",
+                    token: response.data.idToken,
+                });
+
+                if (error) {
+                    console.error("Supabase sign-in error:", error);
+                }
+            }
+        } catch (error) {
+            if (isErrorWithCode(error)) {
+                switch (error.code) {
+                    case statusCodes.IN_PROGRESS:
+                        break;
+                    case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+                        break;
+                    default:
+                        setMessage("Error occured, please try again :)");
+                }
+            } else {
+                setMessage("Error occured, please try again :)");
+            }
+        }
     };
 
     const appleSignIn = async (): Promise<void> => {
@@ -212,6 +253,7 @@ export default function Index() {
                                     </Text>
                                 </Pressable>
                             )}
+                            <Text style={styles.messageText}>{message}</Text>
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
@@ -267,5 +309,10 @@ const styles = StyleSheet.create({
     },
     disabledView: {
         opacity: 0,
+    },
+    messageText: {
+        ...textDefault,
+        fontSize: Sizes.messageText,
+        color: "red",
     },
 });
