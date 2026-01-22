@@ -41,8 +41,6 @@ export default function Index() {
     const [signUpView, setSignUpView] = useState<boolean>(false);
 
     const [message, setMessage] = useState<string>("");
-    const [emailInvalid, setEmailInvalid] = useState<boolean>(false);
-    const [passwordInvalid, setPasswordInvalid] = useState<boolean>(false);
 
     const [authLoaded, setAuthLoaded] = useState(false);
 
@@ -75,18 +73,66 @@ export default function Index() {
         }
     }, [session, authLoaded]);
 
+    // SignUp with email and password
+    const signUp = async (): Promise<void> => {
+        setMessage("");
+
+        // Email validation: must include "@" and "."
+        const emailIsInvalid = !email.includes("@") || !email.includes(".");
+
+        // Password validation:
+        // must be >= 10 characters and contain at least 1 digit
+        const passwordIsInvalid = password.length < 10 || !/\d/.test(password); // \d checks for a digit
+
+        // Confirm password validation
+        // Must be the same as password
+        const confirmPasswordIsInvalid = password !== passwordConfirm;
+
+        if (
+            !emailIsInvalid &&
+            !passwordIsInvalid &&
+            !confirmPasswordIsInvalid
+        ) {
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password
+            })
+
+            if (error) {
+                setMessage(error.message);
+            }
+         } else {
+            if (emailIsInvalid) {
+                setMessage("Incorrect email");
+                return;
+            }
+
+            if (passwordIsInvalid) {
+                setMessage(
+                    "Password must be >= 10 characters and contain at least 1 digit",
+                );
+                return;
+            }
+
+            if (confirmPasswordIsInvalid) {
+                setMessage(
+                    "Password must be the same"
+                );
+                return;
+            }
+        }
+    };
+
     // Email and password signin
     const signIn = async (): Promise<void> => {
         setMessage("");
 
         // Email validation: must include "@" and "."
         const emailIsInvalid = !email.includes("@") || !email.includes(".");
-        setEmailInvalid(emailIsInvalid);
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
         const passwordIsInvalid = password.length < 10 || !/\d/.test(password); // \d checks for a digit
-        setPasswordInvalid(passwordIsInvalid);
 
         if (!emailIsInvalid && !passwordIsInvalid) {
             const { data, error } = await supabase.auth.signInWithPassword({
@@ -238,7 +284,7 @@ export default function Index() {
                                     <Button
                                         title="Sign Up"
                                         onPress={() => {
-                                            router.navigate("/dashboard");
+                                            signUp();
                                         }}
                                     />
                                 </View>
