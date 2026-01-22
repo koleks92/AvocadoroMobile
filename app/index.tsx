@@ -49,7 +49,7 @@ export default function Index() {
         // Google signin configuration
         GoogleSignin.configure({
             webClientId,
-            iosClientId
+            iosClientId,
         });
 
         // Initial Session Load ---
@@ -102,6 +102,18 @@ export default function Index() {
             if (data) {
                 console.log("Signin success:", data);
             }
+        } else {
+            if (emailIsInvalid) {
+                setMessage("Incorrect email");
+                return;
+            }
+
+            if (passwordIsInvalid) {
+                setMessage(
+                    "Password must be >= 10 characters and contain at least 1 digit",
+                );
+                return;
+            }
         }
     };
 
@@ -117,7 +129,7 @@ export default function Index() {
                 });
 
                 if (error) {
-                    console.error("Supabase sign-in error:", error);
+                    setMessage("Error occured, please try again :)");
                 }
             }
         } catch (error) {
@@ -314,6 +326,8 @@ const styles = StyleSheet.create({
     messageText: {
         ...textDefault,
         fontSize: Sizes.messageText,
+        textAlign: "center",
+        marginHorizontal: Sizes.messageMargin,
         color: "red",
     },
 });
