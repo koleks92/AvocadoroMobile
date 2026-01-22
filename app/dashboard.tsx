@@ -1,20 +1,38 @@
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
 import Button from "@/components/UI/Button";
+import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import { useAvocadoro } from "@/store/AvocadoroContext";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Dashboard() {
     const router = useRouter();
+
+    const { supabase, session } = useAvocadoro();
+
+    useEffect(() => {
+        if (!session) {
+            router.navigate("/");
+        }
+    }, [session]);
+
+    async function signOut(): Promise<void> {
+        const { error } = await supabase.auth.signOut();
+    }
 
     return (
         <>
             <AnimatedRoot />
             <View style={styles.root}>
                 <Button
-                    title="Log out"
+                    title={
+                        <MaterialIcons name="logout" size={Sizes.buttonIcon} />
+                    }
                     onPress={() => {
-                        router.navigate("/");
+                        signOut();
                     }}
                 />
                 <Text style={styles.text}>Dashboard.</Text>
