@@ -304,6 +304,7 @@ export default function Index() {
                                                     size={Sizes.buttonIcon}
                                                 />
                                             }
+                                            accessibilityLabel="google-button"
                                             onPress={() => googleSignIn()}
                                             icon={true}
                                         />
