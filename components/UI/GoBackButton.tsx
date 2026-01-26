@@ -12,6 +12,7 @@ export default function GoBackButton({ onPress }: GoBackButtonProps) {
             title={<Ionicons name="chevron-back" size={Sizes.buttonIcon} />}
             icon={true}
             onPress={onPress}
+            accessibilityLabel="go-back-button"
         />
     );
 }
