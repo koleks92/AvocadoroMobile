@@ -8,9 +8,10 @@ interface ButtonProps {
     title: string | ReactNode;
     onPress: () => void;
     icon?: boolean;
+    accessibilityLabel?: string;
 }
 
-export default function Button({ title, onPress, icon }: ButtonProps) {
+export default function Button({ title, onPress, icon, accessibilityLabel }: ButtonProps) {
     return (
         <Pressable
             onPress={onPress}
@@ -19,6 +20,7 @@ export default function Button({ title, onPress, icon }: ButtonProps) {
                 pressed ? styles.pressed : null,
                 icon ? styles.icon : null
             ]}
+            accessibilityLabel={accessibilityLabel}
         >
             <Text style={styles.title}>{title}</Text>
         </Pressable>
