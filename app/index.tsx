@@ -1,5 +1,5 @@
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
-import ShakingLogo from "@/components/UI/AvocadoroImage";
+import ShakingLogo from "@/components/UI/ShakingLogo";
 import Button from "@/components/UI/Button";
 import GoBackButton from "@/components/UI/GoBackButton";
 import InputField from "@/components/UI/Input";
