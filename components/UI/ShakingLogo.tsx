@@ -9,14 +9,12 @@ import Animated, {
 } from "react-native-reanimated";
 
 export default function ShakingLogo() {
-    // 1. Create a "Shared Value" to hold the X position
     const translateX = useSharedValue(0);
 
-    // 2. Define the animation logic
     const handlePress = () => {
-        const duration = 100; // Speed of each shake
+        const duration = 100;
 
-        // Create a sequence: Right -> Left -> Right -> Left -> Back to Center
+        // Create a sequence: Center -> Right -> Left -> Right -> Left -> Back to Center
         translateX.value = withSequence(
             withTiming(0, { duration }),
             withTiming(-6, { duration }),
@@ -27,13 +25,12 @@ export default function ShakingLogo() {
         );
     };
 
-    // 3. Link the value to the style
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateX: translateX.value }],
     }));
 
     return (
-        <Pressable onPress={handlePress}>
+        <Pressable onPress={handlePress} accessibilityLabel="shaking-logo">
             <Animated.Image
                 source={require("@/assets/images/logo.png")}
                 style={[styles.logo, animatedStyle]}
