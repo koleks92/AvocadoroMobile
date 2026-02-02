@@ -1,0 +1,16 @@
+appId: com.koleks92.AvocadoroMobile # This is an example app id. Replace it with your app id.
+---
+- launchApp
+- assertVisible: "Don't have an account yet"
+- tapOn: "Don't have an account yet"
+- assertVisible: "Enter your email"
+- assertVisible: "Enter your password"
+- assertVisible: "Confirm your password"
+- assertVisible: "Sign Up"
+- assertVisible: "shaking-logo"
+- assertNotVisible: "google-button"
+- assertVisible: "go-back-button"
+- tapOn: "go-back-button"
+- assertVisible: "Don't have an account yet"
+- assertVisible: "Sign In"
+- assertNotVisible: "Sign Up"
