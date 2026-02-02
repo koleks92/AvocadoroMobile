@@ -9,7 +9,8 @@ interface InputProps {
     value: string;
     onChangeText: (text: string) => void;
     inputMode: "text" | "email";
-    password?: boolean
+    password?: boolean;
+    accessibilityLabel?: string;
 }
 
 export default function InputField({
@@ -17,7 +18,8 @@ export default function InputField({
     value,
     onChangeText,
     inputMode,
-    password
+    password,
+    accessibilityLabel,
 }: InputProps) {
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
@@ -31,9 +33,10 @@ export default function InputField({
             onBlur={() => setIsFocused(false)}
             inputMode={inputMode}
             secureTextEntry={password}
+            accessibilityLabel={accessibilityLabel}
         />
     );
-} 
+}
 
 const styles = StyleSheet.create({
     root: {
