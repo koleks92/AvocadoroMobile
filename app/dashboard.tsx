@@ -34,6 +34,7 @@ export default function Dashboard() {
                     onPress={() => {
                         signOut();
                     }}
+                    accessibilityLabel="logout-button"
                 />
                 <Text style={styles.text}>Dashboard.</Text>
                 <Button
