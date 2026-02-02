@@ -260,6 +260,7 @@ export default function Index() {
                                     value={email}
                                     onChangeText={(val) => setEmail(val)}
                                     inputMode="email"
+                                    accessibilityLabel="email-field"
                                 />
                                 <InputField
                                     placeholder="Enter your password"
@@ -267,6 +268,7 @@ export default function Index() {
                                     onChangeText={(val) => setPassword(val)}
                                     inputMode="text"
                                     password={true}
+                                    accessibilityLabel="password-field"
                                 />
                                 {signUpView && (
                                     <InputField
@@ -277,6 +279,7 @@ export default function Index() {
                                         }
                                         inputMode="text"
                                         password={true}
+                                        accessibilityLabel="confirm-field"
                                     />
                                 )}
                             </View>
