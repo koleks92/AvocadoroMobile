@@ -1,8 +1,8 @@
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
-import ShakingLogo from "@/components/UI/ShakingLogo";
 import Button from "@/components/UI/Button";
 import GoBackButton from "@/components/UI/GoBackButton";
 import InputField from "@/components/UI/Input";
+import ShakingLogo from "@/components/UI/ShakingLogo";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
@@ -76,6 +76,7 @@ export default function Index() {
     // SignUp with email and password
     const signUp = async (): Promise<void> => {
         setMessage("");
+        Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
         const emailIsInvalid = !email.includes("@") || !email.includes(".");
@@ -95,13 +96,13 @@ export default function Index() {
         ) {
             const { data, error } = await supabase.auth.signUp({
                 email: email,
-                password: password
-            })
+                password: password,
+            });
 
             if (error) {
                 setMessage(error.message);
             }
-         } else {
+        } else {
             if (emailIsInvalid) {
                 setMessage("Incorrect email");
                 return;
@@ -115,9 +116,7 @@ export default function Index() {
             }
 
             if (confirmPasswordIsInvalid) {
-                setMessage(
-                    "Password must be the same"
-                );
+                setMessage("Password must be the same");
                 return;
             }
         }
@@ -126,9 +125,11 @@ export default function Index() {
     // Email and password signin
     const signIn = async (): Promise<void> => {
         setMessage("");
+        Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailIsInvalid = !email.includes("@") || !email.includes(".");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailIsInvalid = !emailRegex.test(email);
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
