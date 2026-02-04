@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primaryGreen,
         borderRadius: Sizes.inputBorderRadius,
         width: Sizes.inputWidth,
+        height: Sizes.buttonInputHeight
     },
     focus: {
         backgroundColor: Colors.primaryDarkGreen,

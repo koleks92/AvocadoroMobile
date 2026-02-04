@@ -10,12 +10,13 @@ export const Sizes = {
     // Root sizes
     rootMargin: windowSize * 0.04,
     rootPadding: windowSize * 0.04,
+    buttonInputHeight: windowSize * 0.16,
 
     // Button
     buttonFont: windowSize * 0.05,
+    buttonPadding: windowSize * 0.04,
     buttonIcon: windowSize * 0.07,
     buttonIconWidth: windowSize * 0.2,
-    buttonPadding: windowSize * 0.04,
     buttonBorderRadius: windowSize * 0.1,
     buttonMargin: windowSize * 0.02,
 

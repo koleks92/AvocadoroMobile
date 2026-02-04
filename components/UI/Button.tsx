@@ -35,10 +35,12 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primaryGreen,
         borderRadius: Sizes.buttonBorderRadius,
         padding: Sizes.buttonPadding,
+        height: Sizes.buttonInputHeight,
         margin: Sizes.buttonMargin,
     },
     icon: {
-        width: Sizes.buttonIconWidth
+        borderRadius: Sizes.buttonInputHeight / 2,
+        width: Sizes.buttonInputHeight
     },
     pressed: {
         backgroundColor: Colors.primaryDarkGreen,
