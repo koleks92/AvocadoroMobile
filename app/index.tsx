@@ -290,6 +290,7 @@ export default function Index() {
                                         onPress={() => {
                                             signUp();
                                         }}
+                                        accessibilityLabel="signup-button"
                                     />
                                 </View>
                             ) : (
@@ -299,6 +300,7 @@ export default function Index() {
                                         onPress={() => {
                                             signIn();
                                         }}
+                                        accessibilityLabel="signin-button"
                                     />
                                     <View style={styles.socialView}>
                                         <Button
