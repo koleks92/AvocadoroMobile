@@ -81,20 +81,20 @@ export default function Index() {
         Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailIsInvalid = !emailValidation(email);
+        const emailIsValid = emailValidation(email);
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
-        const passwordIsInvalid = !passwordValidation(password)
+        const passwordIsValid = passwordValidation(password)
 
         // Confirm password validation
         // Must be the same as password
-        const confirmPasswordIsInvalid = password !== passwordConfirm;
+        const confirmPasswordIsValid = password === passwordConfirm;
 
         if (
-            !emailIsInvalid &&
-            !passwordIsInvalid &&
-            !confirmPasswordIsInvalid
+            emailIsValid &&
+            passwordIsValid &&
+            confirmPasswordIsValid
         ) {
             const { data, error } = await supabase.auth.signUp({
                 email: email,
@@ -105,19 +105,19 @@ export default function Index() {
                 setMessage(error.message);
             }
         } else {
-            if (emailIsInvalid) {
+            if (!emailIsValid) {
                 setMessage("Incorrect email");
                 return;
             }
 
-            if (passwordIsInvalid) {
+            if (!passwordIsValid) {
                 setMessage(
                     "Password must be >= 10 characters and contain at least 1 digit",
                 );
                 return;
             }
 
-            if (confirmPasswordIsInvalid) {
+            if (!confirmPasswordIsValid) {
                 setMessage("Passwords must be the same");
                 return;
             }
@@ -130,13 +130,13 @@ export default function Index() {
         Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailIsInvalid = !emailValidation(email);
+        const emailIsValid = emailValidation(email);
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
-        const passwordIsInvalid = !passwordValidation(password)
+        const passwordIsValid = passwordValidation(password)
 
-        if (!emailIsInvalid && !passwordIsInvalid) {
+        if (emailIsValid && passwordIsValid) {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password,
@@ -152,12 +152,12 @@ export default function Index() {
                 console.log("Signin success:", data);
             }
         } else {
-            if (emailIsInvalid) {
+            if (!emailIsValid) {
                 setMessage("Incorrect email");
                 return;
             }
 
-            if (passwordIsInvalid) {
+            if (!passwordIsValid) {
                 setMessage(
                     "Password must be >= 10 characters and contain at least 1 digit",
                 );

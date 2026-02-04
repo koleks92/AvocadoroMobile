@@ -11,9 +11,7 @@ export const passwordValidation = (password: string): boolean => {
     const hasDigit = /\d/.test(password);
     const hasLetter = /[a-zA-Z]/.test(password);
 
-    
     const passwordIsValid = isLongEnough && hasDigit && hasLetter;
 
-    // Based on your previous code, you wanted to return 'true' if it is INVALID
     return passwordIsValid;
 };
