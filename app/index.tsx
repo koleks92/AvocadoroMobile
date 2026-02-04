@@ -116,7 +116,7 @@ export default function Index() {
             }
 
             if (confirmPasswordIsInvalid) {
-                setMessage("Password must be the same");
+                setMessage("Passwords must be the same");
                 return;
             }
         }
