@@ -1,0 +1,46 @@
+appId: com.koleks92.AvocadoroMobile # This is an example app id. Replace it with your app id.
+---
+- launchApp
+- assertVisible: "Don't have an account yet"
+- tapOn: "Don't have an account yet"
+- assertVisible: "Enter your email"
+- tapOn: "signup-button"
+- assertVisible: "Incorrect email"
+- tapOn: "email-field"
+- inputText: "test@mail"
+- tapOn: "signup-button"
+- assertVisible: "Incorrect email"
+- tapOn: "email-field"
+- eraseText: 20
+- inputText: "test@mail."
+- tapOn: "signup-button"
+- assertVisible: "Incorrect email"
+- tapOn: "email-field"
+- eraseText: 20
+- inputText: "@."
+- tapOn: "signup-button"
+- assertVisible: "Incorrect email"
+- tapOn: "email-field"
+- eraseText: 20
+- inputText: "text@mail.com"
+- tapOn: "signup-button"
+- assertVisible: "Password must be >= 10 characters and contain at least 1 digit"
+- tapOn: "password-field"
+- inputText: "Password"
+- tapOn: "signup-button"
+- assertVisible: "Password must be >= 10 characters and contain at least 1 digit"
+- tapOn: "password-field"
+- eraseText: 20
+- inputText: "Password1"
+- tapOn: "signup-button"
+- assertVisible: "Password must be >= 10 characters and contain at least 1 digit"
+- tapOn: "password-field"
+- eraseText: 20
+- inputText: "Password12345"
+- tapOn: "signup-button"
+- assertVisible: "Passwords must be the same"
+- tapOn: "confirm-field"
+- eraseText: 20
+- inputText: "Password123456"
+- tapOn: "signup-button"
+- assertVisible: "Passwords must be the same"
