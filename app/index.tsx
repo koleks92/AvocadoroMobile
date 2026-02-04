@@ -26,9 +26,11 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
+import { emailValidation, passwordValidation } from "@/util/validation";
 
 const webClientId: string = process.env.EXPO_PUBLIC_WEBCLIENT_ID!;
 const iosClientId: string = process.env.EXPO_PUBLIC_IOSCLIENT_ID!;
+
 
 export default function Index() {
     const router = useRouter();
@@ -79,11 +81,11 @@ export default function Index() {
         Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailIsInvalid = emailValidation();
+        const emailIsInvalid = !emailValidation(email);
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
-        const passwordIsInvalid = password.length < 10 || !/\d/.test(password); // \d checks for a digit
+        const passwordIsInvalid = !passwordValidation(password)
 
         // Confirm password validation
         // Must be the same as password
@@ -128,11 +130,11 @@ export default function Index() {
         Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailIsInvalid = emailValidation();
-        
+        const emailIsInvalid = !emailValidation(email);
+
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
-        const passwordIsInvalid = password.length < 10 || !/\d/.test(password); // \d checks for a digit
+        const passwordIsInvalid = !passwordValidation(password)
 
         if (!emailIsInvalid && !passwordIsInvalid) {
             const { data, error } = await supabase.auth.signInWithPassword({
@@ -217,14 +219,6 @@ export default function Index() {
             setMessage("Error occured, please try again :)");
         }
     };
-
-    const emailValidation = (): boolean => {
-        // Email validation: must include "@" and "."
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const emailIsInvalid = !emailRegex.test(email);
-
-        return emailIsInvalid
-    }
 
     return (
         <>
