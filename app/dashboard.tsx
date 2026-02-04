@@ -35,6 +35,7 @@ export default function Dashboard() {
                         signOut();
                     }}
                     accessibilityLabel="logout-button"
+                    icon={true}
                 />
                 <Text style={styles.text}>Dashboard.</Text>
                 <Button
@@ -50,10 +51,17 @@ export default function Dashboard() {
                     }}
                 />
                 <Button
-                    title="Settings"
+                    title={
+                        <MaterialIcons
+                            name="settings"
+                            size={Sizes.buttonIcon}
+                        />
+                    }
                     onPress={() => {
                         router.navigate("/settings");
                     }}
+                    accessibilityLabel="settings-button"
+                    icon={true}
                 />
             </View>
         </>
