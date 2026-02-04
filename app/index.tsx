@@ -238,15 +238,8 @@ export default function Index() {
                                 </View>
                             ) : (
                                 <View style={styles.disabledView}>
-                                    <Button
-                                        title={
-                                            <Ionicons
-                                                name="chevron-back"
-                                                size={Sizes.buttonIcon}
-                                            />
-                                        }
+                                    <GoBackButton
                                         onPress={() => setSignUpView(false)}
-                                        icon={true}
                                     />
                                 </View>
                             )}
