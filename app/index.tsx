@@ -79,7 +79,7 @@ export default function Index() {
         Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailIsInvalid = !email.includes("@") || !email.includes(".");
+        const emailIsInvalid = emailValidation();
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
@@ -128,9 +128,8 @@ export default function Index() {
         Keyboard.dismiss();
 
         // Email validation: must include "@" and "."
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const emailIsInvalid = !emailRegex.test(email);
-
+        const emailIsInvalid = emailValidation();
+        
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
         const passwordIsInvalid = password.length < 10 || !/\d/.test(password); // \d checks for a digit
@@ -218,6 +217,14 @@ export default function Index() {
             setMessage("Error occured, please try again :)");
         }
     };
+
+    const emailValidation = (): boolean => {
+        // Email validation: must include "@" and "."
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailIsInvalid = !emailRegex.test(email);
+
+        return emailIsInvalid
+    }
 
     return (
         <>
