@@ -39,8 +39,9 @@ const styles = StyleSheet.create({
         margin: Sizes.buttonMargin,
     },
     icon: {
-        borderRadius: Sizes.buttonInputHeight / 2,
-        width: Sizes.buttonInputHeight
+        borderRadius: Sizes.smallButtonHeight / 2,
+        width: Sizes.smallButtonHeight,
+        height: Sizes.smallButtonHeight
     },
     pressed: {
         backgroundColor: Colors.primaryDarkGreen,
