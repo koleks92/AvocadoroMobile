@@ -96,13 +96,14 @@ export default function Dashboard() {
                             router.navigate("/add-group");
                         }}
                         icon={true}
+                        accessibilityLabel="add-button"
                     />
                 </View>
                 <View style={styles.middleView}>
                     <FlatList
                         data={sessionGroups}
                         ListFooterComponent={() => (
-                            <SessionGroup name="Add New Group" addNew={true} />
+                            <SessionGroup name="Add new" addNew={true} />
                         )}
                         renderItem={({ item }) => (
                             <SessionGroup
