@@ -11,6 +11,8 @@ export const Sizes = {
     rootMargin: windowSize * 0.04,
     rootPadding: windowSize * 0.04,
     buttonInputHeight: windowSize * 0.16,
+    smallButtonHeight: windowSize * 0.15,
+    titleSize: windowSize * 0.07,
 
     // Button
     buttonFont: windowSize * 0.05,
@@ -34,5 +36,18 @@ export const Sizes = {
     dontText: windowSize * 0.04,
     messageText: windowSize * 0.04,
     messageMargin: windowSize * 0.05,
-    messageMarginTop: windowSize * 0.03
+    messageMarginTop: windowSize * 0.03,
+
+    // Dashboard
+    dashboardtopBottomHeight: windowSize * 0.2,
+    dashboardMarginTop: windowSize * 0.01,
+
+    // SessionGroup component
+    sgHeight: windowSize * 0.4,
+    sgRootPadding: windowSize * 0.04,
+    sgBorderRadius: windowSize * 0.04,
+    sgTitle: windowSize * 0.04,
+    sgTotalTime: windowSize * 0.035,
+    sgAdd: windowSize * 0.16,
+    sgMargin: windowSize * 0.01
 };
