@@ -1,0 +1,16 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Log in before !
+- launchApp
+- tapOn: "add-button"
+- assertVisible: "Add Group"
+- assertVisible: "go-back-button"
+- tapOn: "go-back-button"
+- tapOn: "settings-button"
+- assertVisible: "Settings"
+- assertVisible: "go-back-button"
+- tapOn: "go-back-button"
+- tapOn: "logout-button"
+- assertVisible: "Don't have an account yet"
+- assertVisible: "Enter your email"
+- assertVisible: "Enter your password"
