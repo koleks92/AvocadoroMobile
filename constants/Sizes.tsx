@@ -9,10 +9,11 @@ const windowSize = windowWidth > windowHeight ? windowHeight : windowWidth;
 export const Sizes = {
     // Root sizes
     rootMargin: windowSize * 0.04,
-    rootPadding: windowSize * 0.04,
+    rootPaddingHorizontal: windowSize * 0.02,
+    rootPaddingVertical: windowSize * 0.01,
     buttonInputHeight: windowSize * 0.16,
     smallButtonHeight: windowSize * 0.15,
-    titleSize: windowSize * 0.07,
+    titleSize: windowSize * 0.06,
     topBottomHeight: windowSize * 0.2,
 
     // Button
