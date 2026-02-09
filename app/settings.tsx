@@ -17,7 +17,7 @@ export default function Settings() {
                         router.back();
                     }}
                 />
-                <Text style={styles.text}>Settings.</Text>
+                <Text style={styles.text}>Settings</Text>
             </View>
         </>
     );

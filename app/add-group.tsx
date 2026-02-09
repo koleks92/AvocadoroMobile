@@ -16,7 +16,7 @@ export default function AddGroup() {
                         router.back();
                     }}
                 />
-                <Text style={styles.text}>Add Group.</Text>
+                <Text style={styles.text}>Add Group</Text>
             </View>
         </>
     );
