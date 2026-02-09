@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     topView: {
         flexDirection: "row",
         justifyContent: "space-between",
-        height: Sizes.dashboardtopBottomHeight,
+        height: Sizes.topBottomHeight,
         width: "100%",
     },
     middleView: {
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     bottomView: {
         flexDirection: "row",
         justifyContent: "space-between",
-        height: Sizes.dashboardtopBottomHeight,
+        height: Sizes.topBottomHeight,
         width: "100%",
     },
     titleView: {

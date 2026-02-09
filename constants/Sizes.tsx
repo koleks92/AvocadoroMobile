@@ -13,6 +13,7 @@ export const Sizes = {
     buttonInputHeight: windowSize * 0.16,
     smallButtonHeight: windowSize * 0.15,
     titleSize: windowSize * 0.07,
+    topBottomHeight: windowSize * 0.2,
 
     // Button
     buttonFont: windowSize * 0.05,
@@ -39,7 +40,6 @@ export const Sizes = {
     messageMarginTop: windowSize * 0.03,
 
     // Dashboard
-    dashboardtopBottomHeight: windowSize * 0.2,
     dashboardMarginTop: windowSize * 0.01,
 
     // SessionGroup component
