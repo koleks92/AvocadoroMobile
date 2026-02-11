@@ -6,8 +6,8 @@ import InputField from "@/components/UI/Input";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
     Keyboard,
     StyleSheet,
@@ -19,6 +19,10 @@ import {
 export default function AddGroup() {
     const router = useRouter();
 
+    // Read values from the route
+    const { groupId, groupName, groupFocusTimer, groupBreakTimer } =
+        useLocalSearchParams();
+
     const { session, supabase, setSession } = useAvocadoro();
 
     const [buttonWidth, setButtonWidth] = useState<number>(0);
@@ -26,10 +30,26 @@ export default function AddGroup() {
     const [focusTimer, setFocusTimer] = useState<number>(25);
     const [breakTimer, setBreakTimer] = useState<number>(5);
 
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [id, setId] = useState<string>("");
+
     const [name, setName] = useState<string>("");
     const [message, setMessage] = useState<string>("");
 
-    async function addNewGroupHandler(): Promise<void> {
+    useEffect(() => {
+        if (!groupId) return;
+
+        if (groupId) {
+            setId(groupId as string);
+            setName(groupName as string);
+            setFocusTimer(Number(groupFocusTimer as string));
+            setBreakTimer(Number(groupBreakTimer as string));
+            setEditMode(true);
+        }
+    }, [groupId]);
+
+    // Add/Edit new session group
+    async function saveGroupHandler(): Promise<void> {
         setMessage("");
 
         // Check if name provided
@@ -62,23 +82,44 @@ export default function AddGroup() {
             return;
         }
 
-        // Insert new data
-        const { data, error } = await supabase
-            .from("session_groups")
-            .insert({
-                user_id: session.user.id,
-                name: name.trim(),
-                focus_timer: focusTimer,
-                break_timer: breakTimer,
-            })
-            .select();
+        if (editMode) {
+            // Edit session group
+            const { data, error } = await supabase
+                .from("session_groups")
+                .update({
+                    name: name.trim(),
+                    focus_timer: focusTimer,
+                    break_timer: breakTimer,
+                })
+                .eq("id", id)
+                .select();
 
-        if (data) {
-            router.navigate("/dashboard");
-        }
+            if (data) {
+                router.navigate("/dashboard");
+            }
 
-        if (error) {
-            setMessage(error.message);
+            if (error) {
+                setMessage(error.message);
+            }
+        } else {
+            // Insert new data (new session group)
+            const { data, error } = await supabase
+                .from("session_groups")
+                .insert({
+                    user_id: session.user.id,
+                    name: name.trim(),
+                    focus_timer: focusTimer,
+                    break_timer: breakTimer,
+                })
+                .select();
+
+            if (data) {
+                router.navigate("/dashboard");
+            }
+
+            if (error) {
+                setMessage(error.message);
+            }
         }
     }
 
@@ -101,7 +142,9 @@ export default function AddGroup() {
                             />
                         </View>
                         <View style={styles.titleView}>
-                            <Text style={styles.titleText}>Add Group</Text>
+                            <Text style={styles.titleText}>
+                                {editMode ? `Edit ${groupName}` : "Add Group"}
+                            </Text>
                         </View>
                         <View style={{ width: buttonWidth }}></View>
                     </View>
@@ -142,13 +185,23 @@ export default function AddGroup() {
                             />
                         </View>
                         <View style={styles.buttonView}>
-                            <Button
-                                title="Add"
-                                onPress={() => {
-                                    addNewGroupHandler();
-                                }}
-                                accessibilityLabel="add-button"
-                            />
+                            {editMode ? (
+                                <Button
+                                    title="Update"
+                                    onPress={() => {
+                                        saveGroupHandler();
+                                    }}
+                                    accessibilityLabel="update-button"
+                                />
+                            ) : (
+                                <Button
+                                    title="Add"
+                                    onPress={() => {
+                                        saveGroupHandler();
+                                    }}
+                                    accessibilityLabel="add-button"
+                                />
+                            )}
                             <Text style={styles.messageText}>{message}</Text>
                         </View>
                     </View>
@@ -190,7 +243,7 @@ const styles = StyleSheet.create({
         fontSize: Sizes.agTimeText,
     },
     buttonView: {
-        alignItems: 'center'
+        alignItems: "center",
     },
     messageText: {
         ...textDefault,
