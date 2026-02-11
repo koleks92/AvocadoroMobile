@@ -49,10 +49,10 @@ export default function Group() {
                                 router.navigate({
                                     pathname: "/add-group",
                                     params: {
-                                        id: id,
-                                        name: name,
-                                        focusTimer: focusTimer,
-                                        breakTimer: breakTimer,
+                                        groupId: id,
+                                        groupName: name,
+                                        groupFocusTimer: focusTimer,
+                                        groupBreakTimer: breakTimer
                                     },
                                 });
                             }}
