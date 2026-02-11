@@ -5,8 +5,8 @@ import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 type SessionGroups = {
@@ -24,44 +24,48 @@ export default function Dashboard() {
 
     const { supabase, session } = useAvocadoro();
 
-    useEffect(() => {
-        if (!session) {
-            router.navigate("/");
+    // Load session group from supabase database and calculate total time
+    const loadGroups = useCallback(async () => {
+        if (!session?.user) return;
+
+        const { data, error } = await supabase
+            .from("session_groups")
+            .select(
+                `
+                id,
+                name,
+                focus_timer,
+                break_timer,
+                sessions ( duration_minutes )
+            `,
+            )
+            .eq("user_id", session.user.id);
+
+        if (error) {
+            console.error("Error loading groups:", error);
+        } else {
+            const groupsWithTotals = data.map((group) => ({
+                ...group,
+                total_minutes: group.sessions.reduce(
+                    (sum, s) => sum + (s.duration_minutes || 0),
+                    0,
+                ),
+            }));
+            setSessionGroups(groupsWithTotals);
         }
+    }, [session]); 
 
-        const loadGroups = async () => {
-            // Wait until session is ready
-            if (!session || !session.user) return;
-
-            const { data, error } = await supabase
-                .from("session_groups")
-                .select(
-                    `
-                    id,
-                    name,
-                    focus_timer,
-                    break_timer,
-                    sessions ( duration_minutes )
-                    `,
-                )
-                .eq("user_id", session.user.id);
-
-            if (error) {
-                console.error("Error loading groups:", error);
-            } else {
-                const groupsWithTotals = data.map((group) => ({
-                    ...group,
-                    total_minutes: group.sessions.reduce(
-                        (sum, s) => sum + s.duration_minutes,
-                        0,
-                    ),
-                }));
-                setSessionGroups(groupsWithTotals);
+    // Run whenever focuse or session changed
+    useFocusEffect(
+        useCallback(() => {
+            if (!session) {
+                router.navigate("/");
+                return;
             }
-        };
 
-        loadGroups();
-    }, [session]);
+            loadGroups();
+        }, [session, loadGroups]),
+    );
 
     async function signOut(): Promise<void> {
         const { error } = await supabase.auth.signOut();
