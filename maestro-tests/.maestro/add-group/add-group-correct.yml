@@ -1,0 +1,21 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Log in before !
+- launchApp
+- assertVisible: "add-button"
+- tapOn: "add-button"
+- tapOn: "name-field"
+- inputText: "Test Maestro"
+- tapOn:
+    text: "35"
+    index: 0
+- tapOn: 
+    text: "15"
+    index: 1
+- tapOn: "add-button"
+- scrollUntilVisible:
+    element:
+        text: "Test Maestro"
+    direction: DOWN
+    timeout: 5000 # Wait up to 5 seconds to find it
+

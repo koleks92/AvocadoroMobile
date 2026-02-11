@@ -1,0 +1,33 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Log in before !
+- launchApp
+- assertVisible: "add-button"
+- tapOn: "add-button"
+- assertVisible: "Add Group"
+- assertVisible: "go-back-button"
+- assertVisible: "Focus time in minutes"
+- assertVisible: "Break time in minutes"
+- assertVisible:
+    text: "25"
+    index: 0
+- assertVisible:
+    text: "25"
+    index: 1
+- assertVisible:
+    text: "5"
+    index: 0
+- assertVisible:
+    text: "5"
+    index: 1
+- assertVisible:
+    text: "60"
+    index: 0
+- assertVisible:
+    text: "60"
+    index: 1
+- assertNotVisible:
+    text: "0"
+    index: 1
+- assertVisible: "Add"
+
