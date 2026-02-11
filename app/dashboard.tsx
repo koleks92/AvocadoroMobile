@@ -105,6 +105,7 @@ export default function Dashboard() {
                         ListFooterComponent={() => (
                             <SessionGroup name="Add new" addNew={true} />
                         )}
+                        showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
                             <SessionGroup
                                 id={item.id}
