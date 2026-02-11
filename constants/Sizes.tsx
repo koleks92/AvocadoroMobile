@@ -10,7 +10,7 @@ export const Sizes = {
     // Root sizes
     rootMargin: windowSize * 0.04,
     rootPaddingHorizontal: windowSize * 0.02,
-    rootPaddingVertical: windowSize * 0.01,
+    rootPaddingVertical: windowSize * 0.02,
     buttonInputHeight: windowSize * 0.16,
     smallButtonHeight: windowSize * 0.15,
     titleSize: windowSize * 0.06,
@@ -50,5 +50,10 @@ export const Sizes = {
     sgTitle: windowSize * 0.04,
     sgTotalTime: windowSize * 0.035,
     sgAdd: windowSize * 0.16,
-    sgMargin: windowSize * 0.01
+    sgMargin: windowSize * 0.01,
+
+    // Add-group
+    agTimeText: windowSize * 0.04,
+    agTimeViewMarginTop: windowSize * 0.1
+
 };
