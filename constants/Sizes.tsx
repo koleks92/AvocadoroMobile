@@ -13,7 +13,7 @@ export const Sizes = {
     rootPaddingVertical: windowSize * 0.02,
     buttonInputHeight: windowSize * 0.16,
     smallButtonHeight: windowSize * 0.15,
-    titleSize: windowSize * 0.06,
+    titleSize: windowSize * 0.055,
     topBottomHeight: windowSize * 0.2,
 
     // Button
