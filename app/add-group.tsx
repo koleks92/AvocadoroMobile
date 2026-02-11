@@ -147,6 +147,7 @@ export default function AddGroup() {
                                 onPress={() => {
                                     addNewGroupHandler();
                                 }}
+                                accessibilityLabel="add-button"
                             />
                             <Text style={styles.messageText}>{message}</Text>
                         </View>
