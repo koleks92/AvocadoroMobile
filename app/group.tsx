@@ -1,16 +1,19 @@
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
+import Button from "@/components/UI/Button";
 import GoBackButton from "@/components/UI/GoBackButton";
+import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 type SessionGroupProps = {
-    id: string
+    id: string;
     name: string;
     focusTimer: string;
     breakTimer: string;
     totalMinutes: string;
-}
+};
 
 export default function Group() {
     const router = useRouter();
@@ -23,13 +26,40 @@ export default function Group() {
         <>
             <AnimatedRoot />
             <View style={styles.root}>
-                <GoBackButton
-                    onPress={() => {
-                        router.back();
-                    }}
-                />
-
-                <Text style={styles.text}>Group.</Text>
+                <View style={styles.topView}>
+                    <View>
+                        <GoBackButton
+                            onPress={() => {
+                                router.back();
+                            }}
+                        />
+                    </View>
+                    <View style={styles.titleView}>
+                        <Text style={styles.titleText}>{name}</Text>
+                    </View>
+                    <View>
+                        <Button
+                            title={
+                                <Ionicons
+                                    name="pencil"
+                                    size={Sizes.buttonIcon}
+                                />
+                            }
+                            onPress={() => {
+                                router.navigate({
+                                    pathname: "/add-group",
+                                    params: {
+                                        id: id,
+                                        name: name,
+                                        focusTimer: focusTimer,
+                                        breakTimer: breakTimer,
+                                    },
+                                });
+                            }}
+                        />
+                    </View>
+                </View>
+                <View style={styles.middleView}></View>
             </View>
         </>
     );
@@ -37,6 +67,22 @@ export default function Group() {
 
 const styles = StyleSheet.create({
     root: rootStyles,
+    topView: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        height: Sizes.topBottomHeight,
+        width: "100%",
+    },
+    titleView: {
+        justifyContent: "center",
+    },
+    titleText: {
+        ...textDefault,
+        fontSize: Sizes.titleSize,
+    },
+    middleView: {
+        flex: 1,
+    },
     text: {
         ...textDefault,
     },
