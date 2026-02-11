@@ -33,7 +33,7 @@ export default function AddGroup() {
         setMessage("");
 
         // Check if name provided
-        if (!name || name === "") {
+        if (!name || name.trim() === "") {
             setMessage("Missing avocadoro name");
             return;
         }
