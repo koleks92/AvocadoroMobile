@@ -30,6 +30,7 @@ export default function AddGroup() {
     const [focusTimer, setFocusTimer] = useState<number>(25);
     const [breakTimer, setBreakTimer] = useState<number>(5);
 
+    const [loading, setLoading] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
     const [id, setId] = useState<string>("");
 
@@ -40,13 +41,27 @@ export default function AddGroup() {
         if (!groupId) return;
 
         if (groupId) {
+            setLoading(true);
             setId(groupId as string);
             setName(groupName as string);
             setFocusTimer(Number(groupFocusTimer as string));
             setBreakTimer(Number(groupBreakTimer as string));
             setEditMode(true);
+
+            console.log(Number(groupFocusTimer as string));
+            console.log(focusTimer);
         }
     }, [groupId]);
+
+    // Make sure that UI catches up with the state update
+    useEffect(() => {
+        if (
+            focusTimer === Number(groupFocusTimer as string) &&
+            breakTimer === Number(groupBreakTimer as string)
+        ) {
+            setLoading(false);
+        }
+    }, [focusTimer, breakTimer]);
 
     // Add/Edit new session group
     async function saveGroupHandler(): Promise<void> {
@@ -77,7 +92,7 @@ export default function AddGroup() {
             return;
         }
 
-        if (existingGroup && existingGroup.id) {
+        if (existingGroup && existingGroup.id !== id) {
             setMessage("You already have a group\n with that name.");
             return;
         }
@@ -121,6 +136,10 @@ export default function AddGroup() {
                 setMessage(error.message);
             }
         }
+    }
+
+    if (loading) {
+        return;
     }
 
     return (
