@@ -75,9 +75,11 @@ const styles = StyleSheet.create({
     },
     titleView: {
         justifyContent: "center",
+        width: "50%",
     },
     titleText: {
         ...textDefault,
+        textAlign: 'center',
         fontSize: Sizes.titleSize,
     },
     middleView: {
