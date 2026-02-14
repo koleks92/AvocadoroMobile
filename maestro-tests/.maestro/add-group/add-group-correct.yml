@@ -5,7 +5,7 @@ appId: com.koleks92.AvocadoroMobile
 - assertVisible: "add-button"
 - tapOn: "add-button"
 - tapOn: "name-field"
-- inputText: "Test Maestro"
+- inputText: "Test"
 - tapOn:
     text: "35"
     index: 0
@@ -15,7 +15,7 @@ appId: com.koleks92.AvocadoroMobile
 - tapOn: "add-button"
 - scrollUntilVisible:
     element:
-        text: "Test Maestro"
+        text: "Test"
     direction: DOWN
     timeout: 5000 # Wait up to 5 seconds to find it
 

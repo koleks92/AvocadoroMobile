@@ -1,0 +1,27 @@
+appId: com.koleks92.AvocadoroMobile
+---
+## Log in before !
+## Make sure that "Test" is added or run add-group-correct before!
+- launchApp
+- tapOn: "Test"
+- tapOn: "edit-button"
+- tapOn: "delete-button"
+- assertVisible: "go-back-button"
+- assertVisible: "Are you sure ?"
+- assertVisible: "delete-button-confirm"
+## Cancel delete
+- tapOn: "go-back-button"
+- assertVisible: "delete-button"
+- assertVisible: "Update"
+- tapOn: "go-back-button"
+- tapOn: "go-back-button"
+- assertVisible: "Test"
+## Delete
+- tapOn: "Test"
+- tapOn: "edit-button"
+- tapOn: "delete-button"
+- assertVisible: "go-back-button"
+- assertVisible: "Are you sure ?"
+- assertVisible: "delete-button-confirm"
+- tapOn: "delete-button-confirm"
+- assertNotVisible: "Test"

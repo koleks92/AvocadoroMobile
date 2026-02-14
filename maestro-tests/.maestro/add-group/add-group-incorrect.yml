@@ -1,0 +1,8 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Log in before !
+- launchApp
+- assertVisible: "add-button"
+- tapOn: "add-button"
+- tapOn: "add-button"
+- assertVisible: "Missing avocadoro name"

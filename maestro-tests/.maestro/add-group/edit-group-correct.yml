@@ -1,0 +1,23 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Log in before ! 
+## Make sure that "Test" is added or run add-group-correct before!
+- launchApp
+- tapOn: "Test"
+- tapOn: "edit-button"
+- tapOn: "name-field"
+- eraseText: 20
+- inputText: "Test Edited"
+- tapOn:
+    text: "10"
+    index: 0
+- tapOn:
+    text: "15"
+    index: 1
+- tapOn: "Update"
+- assertVisible: "Test Edited"
+- assertVisible: "10min"
+- assertVisible: "15min"
+
+
+
