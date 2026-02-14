@@ -6,6 +6,7 @@ import InputField from "@/components/UI/Input";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -32,6 +33,7 @@ export default function AddGroup() {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
+    const [deleteView, setDeleteView] = useState<boolean>(false);
     const [id, setId] = useState<string>("");
 
     const [name, setName] = useState<string>("");
@@ -47,9 +49,6 @@ export default function AddGroup() {
             setFocusTimer(Number(groupFocusTimer as string));
             setBreakTimer(Number(groupBreakTimer as string));
             setEditMode(true);
-
-            console.log(Number(groupFocusTimer as string));
-            console.log(focusTimer);
         }
     }, [groupId]);
 
@@ -138,6 +137,23 @@ export default function AddGroup() {
         }
     }
 
+    // Delete group session
+    async function deleteGroupHandler(): Promise<void> {
+        const { data, error } = await supabase
+            .from("session_groups")
+            .delete()
+            .eq("id", id)
+            .select();
+
+        if (error) {
+            setMessage(error.message);
+        }
+
+        if (data) {
+            router.navigate("/dashboard");
+        }
+    }
+
     if (loading) {
         return;
     }
@@ -156,73 +172,110 @@ export default function AddGroup() {
                         >
                             <GoBackButton
                                 onPress={() => {
-                                    router.back();
+                                    {
+                                        deleteView
+                                            ? setDeleteView(false)
+                                            : router.back();
+                                    }
                                 }}
                             />
                         </View>
                         <View style={styles.titleView}>
                             <Text style={styles.titleText}>
-                                {editMode ? `Edit ${groupName}` : "Add Group"}
+                                {editMode ? groupName : "Add Group"}
                             </Text>
                         </View>
-                        <View style={{ width: buttonWidth }}></View>
-                    </View>
-                    <View style={styles.middleView}>
-                        <View style={styles.nameView}>
-                            <InputField
-                                placeholder="Avocadoro name"
-                                value={name}
-                                onChangeText={(val) => {
-                                    setName(val);
-                                }}
-                                inputMode="text"
-                                accessibilityLabel="name-field"
-                            />
-                        </View>
-                        <View style={styles.timeView}>
-                            <Text style={styles.timeText}>
-                                Focus time in minutes
-                            </Text>
-                            <TimeSelector
-                                min={5}
-                                max={60}
-                                step={5}
-                                defaultValue={focusTimer}
-                                onClick={(time) => setFocusTimer(time)}
-                            />
-                        </View>
-                        <View style={styles.timeView}>
-                            <Text style={styles.timeText}>
-                                Break time in minutes
-                            </Text>
-                            <TimeSelector
-                                min={5}
-                                max={60}
-                                step={5}
-                                defaultValue={breakTimer}
-                                onClick={(time) => setBreakTimer(time)}
-                            />
-                        </View>
-                        <View style={styles.buttonView}>
-                            {editMode ? (
+                        <View style={{ width: buttonWidth }}>
+                            {editMode && !deleteView && (
                                 <Button
-                                    title="Update"
+                                    title={
+                                        <MaterialIcons
+                                            name="delete-outline"
+                                            size={Sizes.buttonIcon}
+                                        />
+                                    }
                                     onPress={() => {
-                                        saveGroupHandler();
+                                        setDeleteView(true);
                                     }}
-                                    accessibilityLabel="update-button"
-                                />
-                            ) : (
-                                <Button
-                                    title="Add"
-                                    onPress={() => {
-                                        saveGroupHandler();
-                                    }}
-                                    accessibilityLabel="add-button"
+                                    icon={true}
                                 />
                             )}
-                            <Text style={styles.messageText}>{message}</Text>
                         </View>
+                    </View>
+                    <View style={styles.middleView}>
+                        {deleteView ? (
+                            <View style={styles.deleteView}>
+                                <Text style={styles.deleteText}>
+                                    Are you sure ?
+                                </Text>
+                                <Button
+                                    title="Delete"
+                                    onPress={() => deleteGroupHandler()}
+                                    accessibilityLabel="delete-button"
+                                    deleteButton={true}
+                                />
+                            </View>
+                        ) : (
+                            <>
+                                <View style={styles.nameView}>
+                                    <InputField
+                                        placeholder="Avocadoro name"
+                                        value={name}
+                                        onChangeText={(val) => {
+                                            setName(val);
+                                        }}
+                                        inputMode="text"
+                                        accessibilityLabel="name-field"
+                                    />
+                                </View>
+                                <View style={styles.timeView}>
+                                    <Text style={styles.timeText}>
+                                        Focus time in minutes
+                                    </Text>
+                                    <TimeSelector
+                                        min={5}
+                                        max={60}
+                                        step={5}
+                                        defaultValue={focusTimer}
+                                        onClick={(time) => setFocusTimer(time)}
+                                    />
+                                </View>
+                                <View style={styles.timeView}>
+                                    <Text style={styles.timeText}>
+                                        Break time in minutes
+                                    </Text>
+                                    <TimeSelector
+                                        min={5}
+                                        max={60}
+                                        step={5}
+                                        defaultValue={breakTimer}
+                                        onClick={(time) => setBreakTimer(time)}
+                                    />
+                                </View>
+                                <View style={styles.buttonView}>
+                                    {editMode ? (
+                                        <Button
+                                            title="Update"
+                                            onPress={() => {
+                                                saveGroupHandler();
+                                            }}
+                                            accessibilityLabel="update-button"
+                                        />
+                                    ) : (
+                                        <Button
+                                            title="Add"
+                                            onPress={() => {
+                                                saveGroupHandler();
+                                            }}
+                                            accessibilityLabel="add-button"
+                                        />
+                                    )}
+                                    <Text style={styles.messageText}>
+                                        {message}
+                                    </Text>
+                                </View>
+                            </>
+                        )}
                     </View>
                 </View>
             </TouchableWithoutFeedback>
@@ -240,9 +293,12 @@ const styles = StyleSheet.create({
     },
     titleView: {
         justifyContent: "center",
+        alignItems: "center",
+        width: "50%",
     },
     titleText: {
         ...textDefault,
+        textAlign: "center",
         fontSize: Sizes.titleSize,
     },
     middleView: {
@@ -270,5 +326,13 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginHorizontal: Sizes.messageMargin / 2,
         color: "red",
+    },
+    deleteView: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    deleteText: {
+        ...textDefault,
+        fontSize: Sizes.agDeleteText,
     },
 });
