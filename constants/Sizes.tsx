@@ -54,6 +54,7 @@ export const Sizes = {
 
     // Add-group
     agTimeText: windowSize * 0.04,
-    agTimeViewMarginTop: windowSize * 0.1
-
+    agTimeViewMarginTop: windowSize * 0.1,
+    agDeleteText: windowSize * 0.06,
+    agDeleteMargin: windowSize * 0.1
 };
