@@ -11,6 +11,7 @@ interface ButtonProps {
     timer?: boolean;
     isSelected?: boolean;
     accessibilityLabel?: string;
+    deleteButton?: boolean
 }
 
 export default function Button({
@@ -20,6 +21,7 @@ export default function Button({
     timer,
     isSelected,
     accessibilityLabel,
+    deleteButton
 }: ButtonProps) {
     return (
         <Pressable
@@ -30,6 +32,7 @@ export default function Button({
                 icon ? styles.icon : null,
                 timer ? styles.timer : null,
                 isSelected ? styles.selected : null,
+                deleteButton ? styles.delete : null,
             ]}
             accessibilityLabel={accessibilityLabel}
         >
@@ -68,4 +71,7 @@ const styles = StyleSheet.create({
         ...textDefault,
         fontSize: Sizes.buttonFont,
     },
+    delete: {
+        backgroundColor: Colors.red
+    }
 });
