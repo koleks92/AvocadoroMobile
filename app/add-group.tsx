@@ -198,6 +198,7 @@ export default function AddGroup() {
                                         setDeleteView(true);
                                     }}
                                     icon={true}
+                                    accessibilityLabel="delete-button"
                                 />
                             )}
                         </View>
@@ -211,7 +212,7 @@ export default function AddGroup() {
                                 <Button
                                     title="Delete"
                                     onPress={() => deleteGroupHandler()}
-                                    accessibilityLabel="delete-button"
+                                    accessibilityLabel="delete-button-confirm"
                                     deleteButton={true}
                                 />
                             </View>

@@ -56,6 +56,7 @@ export default function Group() {
                                     },
                                 });
                             }}
+                            accessibilityLabel="edit-button"
                         />
                     </View>
                 </View>
