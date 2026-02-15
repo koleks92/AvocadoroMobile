@@ -1,0 +1,31 @@
+appId: com.koleks92.AvocadoroMobile # This is an example app id. Replace it with your app id.
+---
+## Log in before ! 
+
+- launchApp
+- assertVisible: "Enter your email"
+- assertVisible: "Enter your password"
+- assertVisible: "Sign In"
+- tapOn: "email-field"
+- inputText: "test2@mail.com"
+- tapOn: "password-field"
+- inputText: "Password123456"
+- tapOn: "signin-button"
+- assertVisible: "settings-button"
+- tapOn: "settings-button"
+- tapOn: "delete-button"
+- assertVisible: "We're sorry to see you go."
+- assertVisible: "If you delete your account, you'll lose access to your progress and saved settings forever."
+- tapOn: "delete-button-confirm"
+- assertVisible: "Enter your email"
+- assertVisible: "Enter your password"
+- assertVisible: "Sign In"
+- tapOn: "email-field"
+- inputText: "test2@mail.com"
+- tapOn: "password-field"
+- inputText: "Password123456"
+- tapOn: "signin-button"
+- assertVisible: "Invalid login credentials"
+
+
+
