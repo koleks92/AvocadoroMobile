@@ -56,5 +56,10 @@ export const Sizes = {
     agTimeText: windowSize * 0.04,
     agTimeViewMarginTop: windowSize * 0.1,
     agDeleteText: windowSize * 0.06,
-    agDeleteMargin: windowSize * 0.1
+    agDeleteMargin: windowSize * 0.1,
+
+    // Settings
+    settingsPadding: windowSize * 0.1,
+    settingsText: windowSize * 0.05,
+    settingsTextMargin: windowSize * 0.04
 };
