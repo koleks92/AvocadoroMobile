@@ -1,6 +1,5 @@
-import { Sizes } from "@/constants/Sizes";
-import { textDefault } from "@/constants/Styles";
-import { FlatList, StyleSheet, View } from "react-native";
+import { useState } from "react";
+import { FlatList, View } from "react-native";
 import RotatingLogo from "./UI/RotatingLogo";
 
 type AvocadoroPrintProps = {
@@ -8,45 +7,34 @@ type AvocadoroPrintProps = {
 };
 
 export default function AvocadoroPrint({ amount }: AvocadoroPrintProps) {
-    // numColumns depends on Sizes.apLogoWidth !!!
-
-    const numOfColumns: number =
-        Math.ceil(
-            (Sizes.windowSize -
-                2 * Sizes.rootMargin -
-                2 * Sizes.rootPaddingHorizontal) /
-                Sizes.apLogoWidth,
-        ) - 1;
+    const [logoWidth, setLogoWidth] = useState<number>(10);
 
     return (
-        <View style={styles.root}>
+        <View
+            style={{
+                flex: 1,
+            }}
+            onLayout={(event) => {
+                const { width } = event.nativeEvent.layout;
+                setLogoWidth(width / 10);
+            }}
+        >
             <FlatList
-                columnWrapperStyle={styles.row} // Add this
+                columnWrapperStyle={{ justifyContent: "flex-start" }}
                 data={Array(amount).fill(null)}
                 keyExtractor={(item, index) => index.toString()}
-                numColumns={numOfColumns}
-                renderItem={({ index }) => (
-                    <View style={styles.logo}>
+                numColumns={10}
+                renderItem={() => (
+                    <View
+                        style={{
+                            aspectRatio: 0.8,
+                            width: logoWidth,
+                        }}
+                    >
                         <RotatingLogo />
                     </View>
                 )}
             />
-
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-        alignItems: "center",
-    },
-    row: {
-        justifyContent: 'flex-start'
-    },
-    logo: {
-        aspectRatio: 0.8,
-        width: Sizes.apLogoWidth,
-    },
-    text: textDefault,
-});
