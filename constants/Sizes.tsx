@@ -8,6 +8,7 @@ const windowSize = windowWidth > windowHeight ? windowHeight : windowWidth;
 
 export const Sizes = {
     // Root sizes
+    windowSize: windowSize,
     rootMargin: windowSize * 0.04,
     rootPaddingHorizontal: windowSize * 0.02,
     rootPaddingVertical: windowSize * 0.02,
@@ -16,7 +17,7 @@ export const Sizes = {
     titleSize: windowSize * 0.055,
     topBottomHeight: windowSize * 0.2,
 
-    // Button
+    // Button component
     buttonFont: windowSize * 0.05,
     buttonPadding: windowSize * 0.04,
     buttonIcon: windowSize * 0.07,
@@ -24,7 +25,7 @@ export const Sizes = {
     buttonBorderRadius: windowSize * 0.1,
     buttonMargin: windowSize * 0.02,
 
-    // Input
+    // Input component
     inputFont: windowSize * 0.04,
     inputPadding: windowSize * 0.05,
     inputMargin: windowSize * 0.02,
@@ -61,5 +62,8 @@ export const Sizes = {
     // Settings
     settingsPadding: windowSize * 0.1,
     settingsText: windowSize * 0.05,
-    settingsTextMargin: windowSize * 0.04
+    settingsTextMargin: windowSize * 0.04,
+
+    // AvocadoroPrint component
+    apLogoWidth: windowSize * 0.1
 };
