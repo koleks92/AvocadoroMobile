@@ -65,5 +65,10 @@ export const Sizes = {
     settingsTextMargin: windowSize * 0.04,
 
     // AvocadoroPrint component
-    apLogoWidth: windowSize * 0.1
+    apLogoWidth: windowSize * 0.1,
+
+    // Group
+    gTotalTimeLabel: windowSize * 0.05,
+    gTotalTimeValue: windowSize * 0.06,
+    gTotalTimeViewMargin: windowSize * 0.04
 };
