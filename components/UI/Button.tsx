@@ -9,6 +9,7 @@ interface ButtonProps {
     onPress: () => void;
     icon?: boolean;
     timer?: boolean;
+    noSpace?: boolean;
     isSelected?: boolean;
     accessibilityLabel?: string;
     deleteButton?: boolean
@@ -19,6 +20,7 @@ export default function Button({
     onPress,
     icon,
     timer,
+    noSpace,
     isSelected,
     accessibilityLabel,
     deleteButton
@@ -33,6 +35,7 @@ export default function Button({
                 timer ? styles.timer : null,
                 isSelected ? styles.selected : null,
                 deleteButton ? styles.delete : null,
+                noSpace ? styles.noSpace : null
             ]}
             accessibilityLabel={accessibilityLabel}
         >
@@ -59,6 +62,11 @@ const styles = StyleSheet.create({
     },
     timer: {
         margin: 0,
+    },
+    noSpace: {
+        height: "auto",
+        margin: 0,
+        padding: 0,
     },
     pressed: {
         backgroundColor: Colors.primaryDarkGreen,
