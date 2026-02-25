@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Text } from "react-native";
 interface ButtonProps {
     title: string | ReactNode;
     onPress: () => void;
+    onLongPress?: () => void;
     icon?: boolean;
     timer?: boolean;
     noSpace?: boolean;
@@ -18,6 +19,7 @@ interface ButtonProps {
 export default function Button({
     title,
     onPress,
+    onLongPress,
     icon,
     timer,
     noSpace,
@@ -28,6 +30,8 @@ export default function Button({
     return (
         <Pressable
             onPress={onPress}
+            onLongPress={onLongPress}
+            delayLongPress={800}
             style={({ pressed }) => [
                 styles.root,
                 pressed ? styles.pressed : null,
