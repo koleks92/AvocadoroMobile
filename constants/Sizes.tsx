@@ -70,5 +70,13 @@ export const Sizes = {
     // Group
     gTotalTimeLabel: windowSize * 0.05,
     gTotalTimeValue: windowSize * 0.06,
-    gTotalTimeViewMargin: windowSize * 0.04
+    gTotalTimeViewMargin: windowSize * 0.04,
+
+    // Timer component
+    timerTitleText: windowSize * 0.15,
+    timerTimeText: windowSize * 0.2,
+
+    // QuotePrinter component
+    quoteText: windowSize * 0.044,
+    quoteAuthor: windowSize * 0.04
 };
