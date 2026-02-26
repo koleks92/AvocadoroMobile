@@ -1,10 +1,12 @@
 import AvocadoroPrint from "@/components/AvocadoroPrint";
+import Timer from "@/components/Timer";
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
 import Button from "@/components/UI/Button";
 import GoBackButton from "@/components/UI/GoBackButton";
 import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import { useAvocadoro } from "@/store/AvocadoroContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -20,6 +22,12 @@ type SessionGroupProps = {
 
 export default function Group() {
     const router = useRouter();
+
+    const { supabase, timerOn } = useAvocadoro();
+
+    // Messages
+    const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [message, setMessage] = useState<string>("");
 
     // Read the values from the route
     const params = useLocalSearchParams<SessionGroupProps>();
@@ -49,6 +57,13 @@ export default function Group() {
 
         setTotalTime(`${paddedHours}h ${paddedMinutes}m`);
     }
+
+    // Cleanup message timer
+    useEffect(() => {
+        return () => {
+            if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         setAvocadoroAmount(Math.floor(totalMinutes / focusTimer));
@@ -129,6 +144,35 @@ export default function Group() {
         ]).start();
     };
 
+    const onCompleteHandler = async (minutes: number): Promise<void> => {
+        setMessage("");
+
+        // Insert data
+        const { data, error } = await supabase
+            .from("sessions")
+            .insert({
+                session_group_id: id,
+                duration_minutes: minutes,
+            })
+            .select();
+
+        setAvocadoroAmount((prev) => prev + 1);
+        setTotalMinutes((prev) => prev + focusTimer);
+
+        if (error) {
+            setMessage(error.message);
+        }
+    };
+
+    const messageTimer = (): void => {
+        if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
+        messageTimerRef.current = setTimeout(() => {
+            setMessage("");
+        }, 5000);
+        setMessage("Reset the timer first!");
+        return;
+    };
+
     return (
         <>
             <AnimatedRoot />
@@ -137,7 +181,11 @@ export default function Group() {
                     <View>
                         <GoBackButton
                             onPress={() => {
-                                router.back();
+                                if (timerOn) {
+                                    messageTimer();
+                                } else {
+                                    router.back();
+                                }
                             }}
                         />
                     </View>
@@ -153,15 +201,19 @@ export default function Group() {
                                 />
                             }
                             onPress={() => {
-                                router.navigate({
-                                    pathname: "/add-group",
-                                    params: {
-                                        groupId: id,
-                                        groupName: name,
-                                        groupFocusTimer: focusTimer,
-                                        groupBreakTimer: breakTimer,
-                                    },
-                                });
+                                if (timerOn) {
+                                    messageTimer();
+                                } else {
+                                    router.navigate({
+                                        pathname: "/add-group",
+                                        params: {
+                                            groupId: id,
+                                            groupName: name,
+                                            groupFocusTimer: focusTimer,
+                                            groupBreakTimer: breakTimer,
+                                        },
+                                    });
+                                }
                             }}
                             icon={true}
                             accessibilityLabel="edit-button"
@@ -179,23 +231,30 @@ export default function Group() {
                         ]}
                     >
                         <View style={styles.insideMiddleView}>
-                            <View style={styles.totalTimeView}> 
-                                <Text style={styles.totalTimeLabel}>Total focus time</Text>
-                                <Text style={styles.totalTimeValue}>{totalTime}</Text>
+                            <View style={styles.totalTimeView}>
+                                <Text style={styles.totalTimeLabel}>
+                                    Total focus time
+                                </Text>
+                                <Text style={styles.totalTimeValue}>
+                                    {totalTime}
+                                </Text>
                             </View>
                             <AvocadoroPrint amount={avocadoroAmount} />
                         </View>
-                        <Button
-                            title={
-                                <Ionicons
-                                    name="chevron-up"
-                                    size={Sizes.buttonIcon}
-                                />
-                            }
-                            onPress={() => {
-                                slideUpAnimation();
-                            }}
-                        />
+                        <View style={styles.slideButtonView}>
+                            <Button
+                                title={
+                                    <Ionicons
+                                        name="chevron-up"
+                                        size={Sizes.buttonIcon}
+                                    />
+                                }
+                                icon={true}
+                                onPress={() => {
+                                    slideUpAnimation();
+                                }}
+                            />
+                        </View>
                     </Animated.View>
                     <Animated.View
                         style={[
@@ -206,17 +265,27 @@ export default function Group() {
                             styles.timerView,
                         ]}
                     >
-                        <Button
-                            title={
-                                <Ionicons
-                                    name="chevron-down"
-                                    size={Sizes.buttonIcon}
-                                />
-                            }
-                            onPress={() => slideDownAnimation()}
-                        />
+                        <View style={styles.slideButtonView}>
+                            <Button
+                                title={
+                                    <Ionicons
+                                        name="chevron-down"
+                                        size={Sizes.buttonIcon}
+                                    />
+                                }
+                                icon={true}
+                                onPress={() => slideDownAnimation()}
+                            />
+                        </View>
                         <View style={styles.insideMiddleView}>
-                            <Text style={styles.text}>Timer</Text>
+                            <Timer
+                                onComplete={(minutes) =>
+                                    onCompleteHandler(minutes)
+                                }
+                                focusTimer={focusTimer}
+                                breakTimer={breakTimer}
+                            />
+                            <Text style={styles.messageText}>{message}</Text>
                         </View>
                     </Animated.View>
                 </View>
@@ -227,12 +296,6 @@ export default function Group() {
 
 const styles = StyleSheet.create({
     root: rootStyles,
-    modalRoot: {
-        flex: 1,
-        margin: Sizes.rootMargin,
-        paddingHorizontal: Sizes.rootPaddingHorizontal,
-        paddingVertical: Sizes.rootPaddingVertical,
-    },
     topView: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -252,6 +315,9 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
     },
+    slideButtonView: {
+        alignItems: "center",
+    },
     text: {
         ...textDefault,
     },
@@ -260,23 +326,31 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     totalTimeView: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: Sizes.gTotalTimeViewMargin
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: Sizes.gTotalTimeViewMargin,
     },
     totalTimeLabel: {
         ...textDefault,
-        fontSize: Sizes.gTotalTimeLabel
+        fontSize: Sizes.gTotalTimeLabel,
     },
     totalTimeValue: {
         ...textDefault,
         fontSize: Sizes.gTotalTimeValue,
-        fontFamily: "MontserratBold"
+        fontFamily: "MontserratBold",
     },
     timerView: {
         overflow: "hidden",
     },
     insideMiddleView: {
         flex: 1,
+    },
+    messageText: {
+        ...textDefault,
+        fontSize: Sizes.messageText,
+        textAlign: "center",
+        marginTop: Sizes.messageMarginTop,
+        marginHorizontal: Sizes.messageMargin,
+        color: "red",
     },
 });
