@@ -24,7 +24,7 @@ export default function AddGroup() {
     const { groupId, groupName, groupFocusTimer, groupBreakTimer } =
         useLocalSearchParams();
 
-    const { session, supabase, setSession } = useAvocadoro();
+    const { session, supabase, message, setMessage } = useAvocadoro();
 
     const [buttonWidth, setButtonWidth] = useState<number>(0);
 
@@ -37,7 +37,6 @@ export default function AddGroup() {
     const [id, setId] = useState<string>("");
 
     const [name, setName] = useState<string>("");
-    const [message, setMessage] = useState<string>("");
 
     useEffect(() => {
         if (!groupId) return;

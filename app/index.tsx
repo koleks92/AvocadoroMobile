@@ -35,18 +35,19 @@ const iosClientId: string = process.env.EXPO_PUBLIC_IOSCLIENT_ID!;
 export default function Index() {
     const router = useRouter();
 
-    const { session, supabase, setSession } = useAvocadoro();
+    const { session, supabase, setSession, message, setMessage } = useAvocadoro();
 
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [passwordConfirm, setPasswordConfirm] = useState<string>("");
     const [signUpView, setSignUpView] = useState<boolean>(false);
 
-    const [message, setMessage] = useState<string>("");
-
     const [authLoaded, setAuthLoaded] = useState(false);
 
     useEffect(() => {
+        // Clean up message
+        setMessage("");
+        
         // Google signin configuration
         GoogleSignin.configure({
             webClientId,

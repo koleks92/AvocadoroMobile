@@ -23,11 +23,10 @@ type SessionGroupProps = {
 export default function Group() {
     const router = useRouter();
 
-    const { supabase, timerOn } = useAvocadoro();
+    const { supabase, timerOn, message, setMessage } = useAvocadoro();
 
     // Messages
     const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const [message, setMessage] = useState<string>("");
 
     // Read the values from the route
     const params = useLocalSearchParams<SessionGroupProps>();

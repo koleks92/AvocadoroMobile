@@ -23,10 +23,9 @@ export default function Timer({
 }: TimerProps) {
     const [timerMode, setTimerMode] = useState<timerModeType>("focus");
     const [totalSeconds, setTotalSeconds] = useState<number>(focusTimer * 60);
-    const [message, setMessage] = useState<string>("");
     const timerRef = useRef<number | null>(null);
 
-    const { timerOn, setTimerOn } = useAvocadoro();
+    const { timerOn, setTimerOn, setMessage } = useAvocadoro();
 
     // Calculate display values
     const minutes = Math.floor(totalSeconds / 60);
@@ -172,9 +171,6 @@ export default function Timer({
                     />
                 </View>
             </View>
-            <View style={styles.messageView}>
-                <Text style={styles.messageText}>{message}</Text>
-            </View>
         </View>
     );
 }
@@ -212,14 +208,5 @@ const styles = StyleSheet.create({
     },
     bottomButtonsView: {
         alignItems: "center",
-    },
-    messageView: { flex: 1 },
-    messageText: {
-        ...textDefault,
-        fontSize: Sizes.messageText,
-        textAlign: "center",
-        marginTop: Sizes.messageMarginTop,
-        marginHorizontal: Sizes.messageMargin,
-        color: "red",
-    },
+    }
 });
