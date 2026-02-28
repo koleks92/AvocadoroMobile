@@ -3,6 +3,7 @@ import { textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { AudioSource, useAudioPlayer } from "expo-audio";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, Vibration, View } from "react-native";
 import QuotePrinter from "./QuotePrinter";
@@ -67,6 +68,7 @@ export default function Timer({
         timerRef.current = window.setInterval(() => {
             setTotalSeconds((prev) => prev - 1);
         }, 1000);
+        activateKeepAwakeAsync();
     };
 
     const stop = (): void => {
@@ -75,6 +77,7 @@ export default function Timer({
             clearInterval(timerRef.current);
             timerRef.current = null;
         }
+        deactivateKeepAwake();
     };
 
     const resetMessage = (): void => {
@@ -93,6 +96,7 @@ export default function Timer({
         setTimerOn(false);
         setTimerMode("focus");
         setMessage("");
+        deactivateKeepAwake();
     };
 
     const skip = (): void => {
@@ -208,5 +212,5 @@ const styles = StyleSheet.create({
     },
     bottomButtonsView: {
         alignItems: "center",
-    }
+    },
 });
