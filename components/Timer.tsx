@@ -24,7 +24,9 @@ export default function Timer({
 }: TimerProps) {
     const [timerMode, setTimerMode] = useState<timerModeType>("focus");
     const [totalSeconds, setTotalSeconds] = useState<number>(focusTimer * 60);
+
     const timerRef = useRef<number | null>(null);
+    const endTimeRef = useRef<number | null>(null);
 
     const { timerOn, setTimerOn, setMessage } = useAvocadoro();
 
@@ -47,6 +49,7 @@ export default function Timer({
             if (timerMode === "break") {
                 setTimerMode("focus");
                 setTotalSeconds(focusTimer * 60);
+                endTimeRef.current = Date.now() + focusTimer * 60 * 1000;
                 focusPlayer.seekTo(0);
                 focusPlayer.play();
                 Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
@@ -54,6 +57,7 @@ export default function Timer({
                 onComplete(focusTimer);
                 setTimerMode("break");
                 setTotalSeconds(breakTimer * 60);
+                endTimeRef.current = Date.now() + breakTimer * 60 * 1000; // <--
                 breakPlayer.seekTo(0);
                 breakPlayer.play();
                 Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
@@ -65,8 +69,13 @@ export default function Timer({
         setMessage("");
         if (timerRef.current !== null) return; // prevent multiple intervals
         setTimerOn(true);
+        endTimeRef.current = Date.now() + totalSeconds * 1000;
         timerRef.current = window.setInterval(() => {
-            setTotalSeconds((prev) => prev - 1);
+            if (endTimeRef.current === null) return;
+            const remaining = Math.ceil(
+                (endTimeRef.current - Date.now()) / 1000,
+            );
+            setTotalSeconds(Math.max(0, remaining));
         }, 1000);
         activateKeepAwakeAsync();
     };
@@ -77,6 +86,7 @@ export default function Timer({
             clearInterval(timerRef.current);
             timerRef.current = null;
         }
+        endTimeRef.current = null;
         deactivateKeepAwake();
     };
 
@@ -93,6 +103,7 @@ export default function Timer({
         }
         timerRef.current = null;
         setTotalSeconds(focusTimer * 60);
+        endTimeRef.current = null;
         setTimerOn(false);
         setTimerMode("focus");
         setMessage("");
@@ -113,8 +124,13 @@ export default function Timer({
 
         // Restart timer if it was running
         if (timerOn) {
+            endTimeRef.current = Date.now() + focusTimer * 60 * 1000;
             timerRef.current = window.setInterval(() => {
-                setTotalSeconds((prev) => prev - 1);
+                if (endTimeRef.current === null) return;
+                const remaining = Math.ceil(
+                    (endTimeRef.current - Date.now()) / 1000,
+                );
+                setTotalSeconds(Math.max(0, remaining));
             }, 1000);
         }
     };
