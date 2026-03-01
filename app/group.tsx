@@ -10,7 +10,15 @@ import { useAvocadoro } from "@/store/AvocadoroContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withTiming,
+} from "react-native-reanimated";
 
 type SessionGroupProps = {
     id: string;
@@ -69,78 +77,40 @@ export default function Group() {
         convertTime();
     }, [totalMinutes]);
 
-    // Animation refs
-    const timerHeight = useRef(new Animated.Value(100)).current;
-    const timerOpacity = useRef(new Animated.Value(1)).current;
+    // Shared values
+    const timerHeight = useSharedValue(100);
+    const timerOpacity = useSharedValue(100);
+    const avocadoroHeight = useSharedValue(0);
+    const avocadoroOpacity = useSharedValue(0);
 
-    const avocadoroHeight = useRef(new Animated.Value(0)).current;
-    const avocadoroOpacity = useRef(new Animated.Value(0)).current;
+    // Animated styles
+    const timerAnimatedStyle = useAnimatedStyle(() => ({
+        height: `${timerHeight.value}%`,
+        opacity: timerOpacity.value,
+    }));
 
-    // Interpolation to percentages
-    const timerHeightInterpolated = timerHeight.interpolate({
-        inputRange: [0, 100],
-        outputRange: ["0%", "100%"],
-    });
+    const avocadoroAnimatedStyle = useAnimatedStyle(() => ({
+        height: `${avocadoroHeight.value}%`,
+        opacity: avocadoroOpacity.value,
+    }));
 
-    const avocadoroHeightInterpolated = avocadoroHeight.interpolate({
-        inputRange: [0, 100],
-        outputRange: ["0%", "100%"],
-    });
+    const timing = { duration: 500, easing: Easing.inOut(Easing.ease) };
 
-    // Animation down
-    const slideDownAnimation = () => {
-        Animated.parallel([
-            Animated.timing(timerHeight, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: false,
-            }),
-            Animated.timing(avocadoroHeight, {
-                toValue: 100,
-                duration: 500,
-                useNativeDriver: false,
-            }),
-            Animated.sequence([
-                Animated.timing(timerOpacity, {
-                    toValue: 0,
-                    duration: 100,
-                    useNativeDriver: false,
-                }),
-                Animated.timing(avocadoroOpacity, {
-                    toValue: 1,
-                    duration: 400,
-                    useNativeDriver: false,
-                }),
-            ]),
-        ]).start();
+    const closeTimerOpenAvocadoro = () => {
+        timerHeight.value = withTiming(0, timing);
+        timerOpacity.value = withTiming(0, { duration: 100 });
+        avocadoroHeight.value = withTiming(100, timing);
+        avocadoroOpacity.value = withDelay(
+            100,
+            withTiming(1, { duration: 100 }),
+        );
     };
 
-    // Animation up
-    const slideUpAnimation = () => {
-        Animated.parallel([
-            Animated.timing(timerHeight, {
-                toValue: 100,
-                duration: 500,
-                useNativeDriver: false,
-            }),
-            Animated.timing(avocadoroHeight, {
-                toValue: 0,
-                duration: 500,
-                useNativeDriver: false,
-            }),
-            Animated.sequence([
-                Animated.timing(avocadoroOpacity, {
-                    toValue: 0,
-                    duration: 100,
-                    useNativeDriver: false,
-                }),
-                Animated.timing(timerOpacity, {
-                    toValue: 1,
-                    duration: 400,
-                    useNativeDriver: false,
-                }),
-            ]),
-        ]).start();
+    const openTimerCloseAvocadoro = () => {
+        timerHeight.value = withTiming(100, timing);
+        timerOpacity.value = withDelay(100, withTiming(1, { duration: 100 }));
+        avocadoroOpacity.value = withTiming(0, { duration: 100 });
+        avocadoroHeight.value = withTiming(0, timing);
     };
 
     const onCompleteHandler = async (minutes: number): Promise<void> => {
@@ -221,13 +191,7 @@ export default function Group() {
                 </View>
                 <View style={styles.middleView}>
                     <Animated.View
-                        style={[
-                            {
-                                height: avocadoroHeightInterpolated,
-                                opacity: avocadoroOpacity,
-                            },
-                            styles.avocadoroView,
-                        ]}
+                        style={[avocadoroAnimatedStyle, styles.avocadoroView]}
                     >
                         <View style={styles.insideMiddleView}>
                             <View style={styles.totalTimeView}>
@@ -250,19 +214,13 @@ export default function Group() {
                                 }
                                 icon={true}
                                 onPress={() => {
-                                    slideUpAnimation();
+                                    openTimerCloseAvocadoro();
                                 }}
                             />
                         </View>
                     </Animated.View>
                     <Animated.View
-                        style={[
-                            {
-                                height: timerHeightInterpolated,
-                                opacity: timerOpacity,
-                            },
-                            styles.timerView,
-                        ]}
+                        style={[timerAnimatedStyle, styles.timerView]}
                     >
                         <View style={styles.slideButtonView}>
                             <Button
@@ -273,7 +231,7 @@ export default function Group() {
                                     />
                                 }
                                 icon={true}
-                                onPress={() => slideDownAnimation()}
+                                onPress={() => closeTimerOpenAvocadoro()}
                             />
                         </View>
                         <View style={styles.insideMiddleView}>
