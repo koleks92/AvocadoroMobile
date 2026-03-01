@@ -53,7 +53,7 @@ export default function Dashboard() {
             }));
             setSessionGroups(groupsWithTotals);
         }
-    }, [session]); 
+    }, [session]);
 
     // Run whenever focuse or session changed
     useFocusEffect(
@@ -107,7 +107,17 @@ export default function Dashboard() {
                     <FlatList
                         data={sessionGroups}
                         ListFooterComponent={() => (
-                            <SessionGroup name="Add new" addNew={true} />
+                            <>
+                                {/* FOR TEST ONLY !!! */}
+                                <SessionGroup
+                                    name="TestMaestro"
+                                    id="123123123"
+                                    totalMinutes={0}
+                                    focusTimer={0.15}
+                                    breakTimer={0.15}
+                                />
+                                <SessionGroup name="Add new" addNew={true} />
+                            </>
                         )}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
