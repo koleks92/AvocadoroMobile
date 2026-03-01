@@ -70,8 +70,12 @@ export default function Timer({
         if (timerRef.current === null) return;
 
         // Cancel notification if app is active
-        if (totalSeconds === 1 && appIsActive) {
-            notifee.cancelAllNotifications();
+        const cancelNotification = async () => {
+            await notifee.cancelAllNotifications();
+        };
+
+        if (totalSeconds === 3 && appIsActive) {
+            cancelNotification();
         }
 
         // Timer functions
