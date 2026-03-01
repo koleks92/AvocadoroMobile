@@ -116,6 +116,12 @@ export default function Group() {
     const onCompleteHandler = async (minutes: number): Promise<void> => {
         setMessage("");
 
+        // TEST MODE
+        if (minutes === 0.15) {
+            console.log("Test")
+            return;
+        }
+
         // Insert data
         const { data, error } = await supabase
             .from("sessions")
