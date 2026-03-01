@@ -2,10 +2,11 @@ import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import notifee, { TriggerType } from "@notifee/react-native";
 import { AudioSource, useAudioPlayer } from "expo-audio";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, Vibration, View } from "react-native";
+import { AppState, StyleSheet, Text, Vibration, View } from "react-native";
 import QuotePrinter from "./QuotePrinter";
 import Button from "./UI/Button";
 
@@ -41,15 +42,46 @@ export default function Timer({
     const focusPlayer = useAudioPlayer(focusTimeSound);
     const breakPlayer = useAudioPlayer(breakTimeSound);
 
+    // CHeck if app is active
+    const [appIsActive, setAppIsActive] = useState(true);
+
+    // Notifee configuration and event listener for appIsActive
     useEffect(() => {
-        // Timer
+        const subscription = AppState.addEventListener(
+            "change",
+            (nextState) => {
+                setAppIsActive(nextState === "active");
+            },
+        );
+        const requestNotifee = async () => {
+            await notifee.createChannel({
+                id: "avocadoro",
+                name: "Avocadoro Timer",
+            });
+            await notifee.requestPermission();
+        };
+
+        requestNotifee();
+        return () => subscription.remove();
+    }, []);
+
+    useEffect(() => {
+        // If timer is off
         if (timerRef.current === null) return;
 
-        if (totalSeconds === 0) {
+        // Cancel notification if app is active
+        if (totalSeconds === 1 && appIsActive) {
+            notifee.cancelAllNotifications();
+        }
+
+        // Timer functions
+        if (totalSeconds === 0 && appIsActive) {
             if (timerMode === "break") {
                 setTimerMode("focus");
                 setTotalSeconds(focusTimer * 60);
+                // Calculate end time when app is inactive
                 endTimeRef.current = Date.now() + focusTimer * 60 * 1000;
+                scheduleNotification(focusTimer * 60, "focus");
                 focusPlayer.seekTo(0);
                 focusPlayer.play();
                 Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
@@ -57,18 +89,22 @@ export default function Timer({
                 onComplete(focusTimer);
                 setTimerMode("break");
                 setTotalSeconds(breakTimer * 60);
-                endTimeRef.current = Date.now() + breakTimer * 60 * 1000; // <--
+                // Calculate end time when app is inactive
+                endTimeRef.current = Date.now() + breakTimer * 60 * 1000;
+                scheduleNotification(breakTimer * 60, "break");
                 breakPlayer.seekTo(0);
                 breakPlayer.play();
                 Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
             }
         }
-    }, [totalSeconds]);
+    }, [totalSeconds, appIsActive]);
 
-    const start = (): void => {
+    // Start timer function
+    const start = async (): Promise<void> => {
         setMessage("");
         if (timerRef.current !== null) return; // prevent multiple intervals
         setTimerOn(true);
+        scheduleNotification(totalSeconds, timerMode);
         endTimeRef.current = Date.now() + totalSeconds * 1000;
         timerRef.current = window.setInterval(() => {
             if (endTimeRef.current === null) return;
@@ -80,7 +116,8 @@ export default function Timer({
         activateKeepAwakeAsync();
     };
 
-    const stop = (): void => {
+    // Stop/Pause timer
+    const stop = async (): Promise<void> => {
         setMessage("");
         if (timerRef.current !== null) {
             clearInterval(timerRef.current);
@@ -88,8 +125,10 @@ export default function Timer({
         }
         endTimeRef.current = null;
         deactivateKeepAwake();
+        await notifee.cancelAllNotifications(); // clear any previous pending
     };
 
+    // Reset message to prevent accidental press
     const resetMessage = (): void => {
         setMessage("Hold for 1 second to reset");
         setTimeout(() => {
@@ -97,7 +136,8 @@ export default function Timer({
         }, 5000);
     };
 
-    const reset = (): void => {
+    // Reset the timer
+    const reset = async (): Promise<void> => {
         if (timerRef.current !== null) {
             clearInterval(timerRef.current);
         }
@@ -108,9 +148,11 @@ export default function Timer({
         setTimerMode("focus");
         setMessage("");
         deactivateKeepAwake();
+        await notifee.cancelAllNotifications();
     };
 
-    const skip = (): void => {
+    // Skip break function
+    const skip = async (): Promise<void> => {
         // Clear existing interval if running
         if (timerRef.current !== null) {
             clearInterval(timerRef.current);
@@ -132,7 +174,42 @@ export default function Timer({
                 );
                 setTotalSeconds(Math.max(0, remaining));
             }, 1000);
+            scheduleNotification(focusTimer * 60, "focus");
+        } else {
+            await notifee.cancelAllNotifications();
         }
+    };
+
+    // Schedule notification when app is not active
+    const scheduleNotification = async (
+        seconds: number,
+        mode: "focus" | "break",
+    ) => {
+        await notifee.cancelAllNotifications(); // clear any previous pending
+
+        await notifee.createTriggerNotification(
+            {
+                title:
+                    mode === "focus"
+                        ? "✅ Focus session done!"
+                        : "☕ Break over!",
+                body:
+                    mode === "focus"
+                        ? "Click to start the break mode!"
+                        : "Click to start the focus mode!",
+                android: {
+                    channelId: "avocadoro",
+                    pressAction: { id: "default" },
+                },
+                ios: {
+                    sound: "default",
+                },
+            },
+            {
+                type: TriggerType.TIMESTAMP,
+                timestamp: Date.now() + seconds * 1000,
+            },
+        );
     };
 
     return (
