@@ -110,7 +110,7 @@ export default function Dashboard() {
                             <>
                                 {/* FOR TEST ONLY !!! */}
                                 <SessionGroup
-                                    name="TestMaestro"
+                                    name="TMS"
                                     id="123123123"
                                     totalMinutes={0}
                                     focusTimer={0.15}
