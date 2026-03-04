@@ -118,7 +118,9 @@ export default function Group() {
 
         // TEST MODE
         if (minutes === 0.15) {
-            console.log("Test")
+            console.log("Test");
+            setAvocadoroAmount((prev) => prev + 1);
+            setTotalMinutes((prev) => prev + focusTimer);
             return;
         }
 
@@ -222,6 +224,7 @@ export default function Group() {
                                 onPress={() => {
                                     openTimerCloseAvocadoro();
                                 }}
+                                accessibilityLabel="up-button"
                             />
                         </View>
                     </Animated.View>
@@ -238,6 +241,7 @@ export default function Group() {
                                 }
                                 icon={true}
                                 onPress={() => closeTimerOpenAvocadoro()}
+                                accessibilityLabel="down-button"
                             />
                         </View>
                         <View style={styles.insideMiddleView}>

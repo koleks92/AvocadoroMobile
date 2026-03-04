@@ -57,8 +57,8 @@ export default function QuotePrinter() {
     if (currentQuote) {
         return (
             <View style={styles.root}>
-                <Text style={styles.quoteText}>{currentQuote.quote}</Text>
-                <Text style={styles.quoteAuthor}>{currentQuote.author}</Text>
+                <Text style={styles.quoteText} accessibilityLabel="quote-quote">{currentQuote.quote}</Text>
+                <Text style={styles.quoteAuthor} accessibilityLabel="quote-author">{currentQuote.author}</Text>
             </View>
         );
     } else {

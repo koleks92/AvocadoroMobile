@@ -252,6 +252,7 @@ export default function Timer({
                         title={<Ionicons name="play" size={Sizes.buttonIcon} />}
                         icon={true}
                         onPress={() => start()}
+                        accessibilityLabel="play-button"
                     />
                     <Button
                         title={
@@ -259,6 +260,8 @@ export default function Timer({
                         }
                         icon={true}
                         onPress={() => stop()}
+                        accessibilityLabel="stop-button"
+
                     />
                 </View>
                 <View style={styles.bottomButtonsView}>
@@ -269,6 +272,8 @@ export default function Timer({
                         icon={true}
                         onPress={() => resetMessage()}
                         onLongPress={() => reset()}
+                        accessibilityLabel="reset-button"
+                        
                     />
                 </View>
             </View>
