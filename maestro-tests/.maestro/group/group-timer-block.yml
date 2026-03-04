@@ -1,0 +1,16 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Log in before !
+## Make sure that MaestroTestShort GroupSession is uncommented !
+- launchApp
+- assertVisible: "TMS"
+- tapOn: "TMS"
+- assertVisible: "TMS"
+- tapOn: "play-button"
+- tapOn: "go-back-button"
+- assertVisible: "Reset the timer first!"
+- tapOn: "edit-button"
+- assertVisible: "Reset the timer first!"
+- tapOn: "reset-button"
+- assertVisible: "Hold for 1 second to reset"
+
