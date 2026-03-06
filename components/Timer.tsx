@@ -80,26 +80,41 @@ export default function Timer({
 
         // Timer functions
         if (totalSeconds === 0 && appIsActive) {
-            if (timerMode === "break") {
-                setTimerMode("focus");
-                setTotalSeconds(focusTimer * 60);
-                // Calculate end time when app is inactive
-                endTimeRef.current = Date.now() + focusTimer * 60 * 1000;
-                scheduleNotification(focusTimer * 60, "focus");
-                focusPlayer.seekTo(0);
-                focusPlayer.play();
-                Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
-            } else {
-                onComplete(focusTimer);
-                setTimerMode("break");
-                setTotalSeconds(breakTimer * 60);
-                // Calculate end time when app is inactive
-                endTimeRef.current = Date.now() + breakTimer * 60 * 1000;
-                scheduleNotification(breakTimer * 60, "break");
-                breakPlayer.seekTo(0);
-                breakPlayer.play();
-                Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
+            if (timerRef.current !== null) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
             }
+
+            setTimeout(() => {
+                if (timerMode === "break") {
+                    setTimerMode("focus");
+                    setTotalSeconds(focusTimer * 60);
+                    // Calculate end time when app is inactive
+                    endTimeRef.current = Date.now() + focusTimer * 60 * 1000;
+                    scheduleNotification(focusTimer * 60, "focus");
+                    focusPlayer.seekTo(0);
+                    focusPlayer.play();
+                    Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
+                } else {
+                    onComplete(focusTimer);
+                    setTimerMode("break");
+                    setTotalSeconds(breakTimer * 60);
+                    // Calculate end time when app is inactive
+                    endTimeRef.current = Date.now() + breakTimer * 60 * 1000;
+                    scheduleNotification(breakTimer * 60, "break");
+                    breakPlayer.seekTo(0);
+                    breakPlayer.play();
+                    Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
+                }
+            }, 1000);
+
+            timerRef.current = window.setInterval(() => {
+                if (endTimeRef.current === null) return;
+                const remaining = Math.ceil(
+                    (endTimeRef.current - Date.now()) / 1000,
+                );
+                setTotalSeconds(Math.max(0, remaining));
+            }, 1000);
         }
     }, [totalSeconds, appIsActive]);
 
@@ -261,7 +276,6 @@ export default function Timer({
                         icon={true}
                         onPress={() => stop()}
                         accessibilityLabel="stop-button"
-
                     />
                 </View>
                 <View style={styles.bottomButtonsView}>
@@ -273,7 +287,6 @@ export default function Timer({
                         onPress={() => resetMessage()}
                         onLongPress={() => reset()}
                         accessibilityLabel="reset-button"
-                        
                     />
                 </View>
             </View>
