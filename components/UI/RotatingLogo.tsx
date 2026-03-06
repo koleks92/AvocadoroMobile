@@ -38,6 +38,7 @@ export default function RotatingLogo() {
                 source={require("@/assets/images/logo_nospace.png")}
                 style={[styles.logo, animatedStyle]}
                 resizeMode="contain"
+                accessibilityLabel="avocadoro-print"
             />
         </Pressable>
     );
