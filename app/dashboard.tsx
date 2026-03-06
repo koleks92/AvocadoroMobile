@@ -113,8 +113,8 @@ export default function Dashboard() {
                                     name="TMS"
                                     id="123123123"
                                     totalMinutes={0}
-                                    focusTimer={0.15}
-                                    breakTimer={0.15}
+                                    focusTimer={0.1}
+                                    breakTimer={0.1}
                                 />
                                 <SessionGroup name="Add new" addNew={true} />
                             </>
