@@ -117,7 +117,7 @@ export default function Group() {
         setMessage("");
 
         // TEST MODE
-        if (minutes === 0.15) {
+        if (minutes === 0.1) {
             console.log("Test");
             setAvocadoroAmount((prev) => prev + 1);
             setTotalMinutes((prev) => prev + focusTimer);

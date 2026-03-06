@@ -1,0 +1,44 @@
+appId: com.koleks92.AvocadoroMobile
+---
+## Log in before !
+## Make sure that MaestroTestShort GroupSession is uncommented !
+- launchApp
+- assertVisible: "TMS"
+- tapOn: "TMS"
+- assertVisible: "TMS"
+- tapOn: "play-button"
+- assertVisible: "Focus"
+- assertNotVisible: "Skip"
+- waitForAnimationToEnd:
+    timeout: 4000 # Wait up to 5s for movement to stop
+- assertVisible: "00:00"
+- waitForAnimationToEnd:
+    timeout: 2000 # Wait up to 5s for movement to stop
+- assertVisible: "Break"
+- waitForAnimationToEnd:
+    timeout: 4000 # Wait up to 5s for movement to stop
+- assertVisible: "00:00"
+- waitForAnimationToEnd:
+    timeout: 2000 # Wait up to 5s for movement to stop
+- assertVisible: "Focus"
+- waitForAnimationToEnd:
+    timeout: 4000 # Wait up to 5s for movement to stop
+- assertVisible: "00:00"
+- waitForAnimationToEnd:
+    timeout: 2000 # Wait up to 5s for movement to stop
+- assertVisible: "Break"
+- assertVisible: "Skip"
+- tapOn: "stop-button"
+- tapOn: "down-button"
+## It passed only two times, so only two avocadoro should be printed
+- assertVisible:
+    text: "avocadoro-print"
+    index: 0 # first one
+- assertVisible:
+    text: "avocadoro-print"
+    index: 1 # second one
+- assertNotVisible:
+    text: "avocadoro-print"
+    index: 2 # third
+- assertVisible: "Total focus time"
+- assertVisible: "00h 0.2m"
