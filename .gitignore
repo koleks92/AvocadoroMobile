@@ -44,3 +44,5 @@ app-example
 
 # builds
 /builds
+
+.env.local

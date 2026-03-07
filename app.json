@@ -51,7 +51,15 @@
         }
       ],
       "expo-apple-authentication",
-      "expo-audio"
+      "expo-audio",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "avocadoro",
+          "organization": "dishdate"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
