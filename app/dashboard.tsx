@@ -108,14 +108,14 @@ export default function Dashboard() {
                         data={sessionGroups}
                         ListFooterComponent={() => (
                             <>
-                                {/* FOR TEST ONLY !!! */}
+                                {/* FOR TEST ONLY !!!
                                 <SessionGroup
                                     name="TMS"
                                     id="123123123"
                                     totalMinutes={0}
                                     focusTimer={0.1}
                                     breakTimer={0.1}
-                                />
+                                /> */}
                                 <SessionGroup name="Add new" addNew={true} />
                             </>
                         )}
