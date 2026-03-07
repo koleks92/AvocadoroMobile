@@ -8,6 +8,11 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
+SplashScreen.setOptions({
+    duration: 500,
+    fade: true,
+});
+
 export default function RootLayout() {
     const [loaded] = useFonts({
         MontserratRegular: require("../assets/fonts/Montserrat-Regular.ttf"),
