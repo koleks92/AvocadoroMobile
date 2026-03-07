@@ -6,13 +6,14 @@ import ShakingLogo from "@/components/UI/ShakingLogo";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
+import { emailValidation, passwordValidation } from "@/util/validation";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import {
     GoogleSignin,
     isErrorWithCode,
     statusCodes,
 } from "@react-native-google-signin/google-signin";
+import { JwtPayload } from "@supabase/supabase-js";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -26,16 +27,15 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { emailValidation, passwordValidation } from "@/util/validation";
 
 const webClientId: string = process.env.EXPO_PUBLIC_WEBCLIENT_ID!;
 const iosClientId: string = process.env.EXPO_PUBLIC_IOSCLIENT_ID!;
 
-
 export default function Index() {
     const router = useRouter();
 
-    const { session, supabase, setSession, message, setMessage } = useAvocadoro();
+    const { session, supabase, setSession, message, setMessage } =
+        useAvocadoro();
 
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -44,10 +44,12 @@ export default function Index() {
 
     const [authLoaded, setAuthLoaded] = useState(false);
 
+    const [claims, setClaims] = useState<JwtPayload | null>(null);
+
     useEffect(() => {
         // Clean up message
         setMessage("");
-        
+
         // Google signin configuration
         GoogleSignin.configure({
             webClientId,
@@ -55,17 +57,20 @@ export default function Index() {
         });
 
         // Initial Session Load ---
-        supabase.auth.getSession().then(({ data }) => {
-            setSession(data.session);
-            setAuthLoaded(true); // Initial state resolved
+        supabase.auth.getClaims().then(({ data }) => {
+            if (data) setClaims(data.claims);
         });
 
         // Supabase Real-time Listener ---
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setSession(session);
-            },
-        );
+        const { data: listener } = supabase.auth.onAuthStateChange(() => {
+            supabase.auth.getClaims().then(({ data }) => {
+                if (data) {
+                    setClaims(data.claims);
+                }
+            });
+        });
+        
+        setAuthLoaded(true);
 
         return () => listener.subscription.unsubscribe();
     }, []);
@@ -86,17 +91,13 @@ export default function Index() {
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
-        const passwordIsValid = passwordValidation(password)
+        const passwordIsValid = passwordValidation(password);
 
         // Confirm password validation
         // Must be the same as password
         const confirmPasswordIsValid = password === passwordConfirm;
 
-        if (
-            emailIsValid &&
-            passwordIsValid &&
-            confirmPasswordIsValid
-        ) {
+        if (emailIsValid && passwordIsValid && confirmPasswordIsValid) {
             const { data, error } = await supabase.auth.signUp({
                 email: email,
                 password: password,
@@ -135,7 +136,7 @@ export default function Index() {
 
         // Password validation:
         // must be >= 10 characters and contain at least 1 digit
-        const passwordIsValid = passwordValidation(password)
+        const passwordIsValid = passwordValidation(password);
 
         if (emailIsValid && passwordIsValid) {
             const { data, error } = await supabase.auth.signInWithPassword({
