@@ -44,5 +44,7 @@ app-example
 
 # builds
 /builds
+*.apk
+*.ipa
 
 .env.local
