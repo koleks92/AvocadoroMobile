@@ -1,78 +1,86 @@
 {
-  "expo": {
-    "name": "AvocadoroMobile",
-    "slug": "AvocadoroMobile",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/adaptive-icon.png",
-    "scheme": "avocadoromobile",
-    "userInterfaceStyle": "automatic",
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.koleks92.AvocadoroMobile",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      },
-      "usesAppleSignIn": true,
-      "icon": {
-        "dark": "./assets/images/ios-dark.png",
-        "light": "./assets/images/ios-light.png",
-        "tinted": "./assets/images/ios-tinted.png"
-      }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#0F0F0F",
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundImage": "./assets/images/adaptive-icon.png",
-        "monochromeImage": "./assets/images/adaptive-icon.png"
-      },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.koleks92.AvocadoroMobile"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon-dark.png",
-          "dark": {
-            "image": "./assets/images/splash-icon-dark.png",
-            "backgroundColor": "#0F0F0F"
-          },
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#0F0F0F"
+    "expo": {
+        "name": "AvocadoroMobile",
+        "slug": "AvocadoroMobile",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/adaptive-icon.png",
+        "scheme": "avocadoromobile",
+        "userInterfaceStyle": "automatic",
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.koleks92.AvocadoroMobile",
+            "infoPlist": {
+                "ITSAppUsesNonExemptEncryption": false
+            },
+            "usesAppleSignIn": true,
+            "icon": {
+                "dark": "./assets/images/ios-dark.png",
+                "light": "./assets/images/ios-light.png",
+                "tinted": "./assets/images/ios-tinted.png"
+            }
+        },
+        "android": {
+            "adaptiveIcon": {
+                "backgroundColor": "#0F0F0F",
+                "foregroundImage": "./assets/images/adaptive-icon.png",
+                "backgroundImage": "./assets/images/adaptive-icon.png",
+                "monochromeImage": "./assets/images/adaptive-icon.png"
+            },
+            "predictiveBackGestureEnabled": false,
+            "package": "com.koleks92.AvocadoroMobile"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/splash-icon-dark.png",
+                    "dark": {
+                        "image": "./assets/images/splash-icon-dark.png",
+                        "backgroundColor": "#0F0F0F"
+                    },
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#0F0F0F"
+                }
+            ],
+            "expo-sqlite",
+            [
+                "@react-native-google-signin/google-signin",
+                {
+                    "iosUrlScheme": "com.googleusercontent.apps.341256711027-hheof1hut3om4ele8b134af9ra2kft79"
+                }
+            ],
+            "expo-apple-authentication",
+            "expo-audio",
+            [
+                "@sentry/react-native/expo",
+                {
+                    "url": "https://sentry.io/",
+                    "project": "avocadoro",
+                    "organization": "dishdate"
+                }
+            ],
+            "expo-asset",
+            [
+                "expo-build-properties",
+                {
+                    "ios": {
+                        "useFrameworks": "static"
+                    }
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true,
+            "reactCompiler": true
+        },
+        "extra": {
+            "router": {},
+            "eas": {
+                "projectId": "20fef8ae-4103-46a1-97a5-770e29cc997b"
+            }
         }
-      ],
-      "expo-sqlite",
-      [
-        "@react-native-google-signin/google-signin",
-        {
-          "iosUrlScheme": "com.googleusercontent.apps.341256711027-hheof1hut3om4ele8b134af9ra2kft79"
-        }
-      ],
-      "expo-apple-authentication",
-      "expo-audio",
-      [
-        "@sentry/react-native/expo",
-        {
-          "url": "https://sentry.io/",
-          "project": "avocadoro",
-          "organization": "dishdate"
-        }
-      ],
-      "expo-asset"
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "20fef8ae-4103-46a1-97a5-770e29cc997b"
-      }
     }
-  }
 }
