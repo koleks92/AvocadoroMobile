@@ -212,6 +212,7 @@ export default function Group() {
                             </View>
                             <AvocadoroPrint amount={avocadoroAmount} />
                         </View>
+                        <Text style={styles.messageText}>{message}</Text>
                         <View style={styles.slideButtonView}>
                             <Button
                                 title={
