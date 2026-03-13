@@ -5,9 +5,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import notifee, { TriggerType } from "@notifee/react-native";
 import { AudioSource, useAudioPlayer } from "expo-audio";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState, StyleSheet, Text, Vibration, View } from "react-native";
 import QuotePrinter from "./QuotePrinter";
+import TimeDisplay from "./TimeDisplay";
 import Button from "./UI/Button";
 
 type timerModeType = "focus" | "break";
@@ -30,10 +31,6 @@ export default function Timer({
     const endTimeRef = useRef<number | null>(null);
 
     const { timerOn, setTimerOn, setMessage } = useAvocadoro();
-
-    // Calculate display values
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
 
     // Import sounds
     const breakTimeSound: AudioSource = require("@/assets/sounds/breakTime.mp3");
@@ -119,7 +116,7 @@ export default function Timer({
     }, [totalSeconds, appIsActive]);
 
     // Start timer function
-    const start = async (): Promise<void> => {
+    const start = useCallback(async (): Promise<void> => {
         setMessage("");
         if (timerRef.current !== null) return; // prevent multiple intervals
         setTimerOn(true);
@@ -133,10 +130,10 @@ export default function Timer({
             setTotalSeconds(Math.max(0, remaining));
         }, 1000);
         activateKeepAwakeAsync();
-    };
+    }, [totalSeconds, timerMode, timerOn]);
 
     // Stop/Pause timer
-    const stop = async (): Promise<void> => {
+    const stop = useCallback(async (): Promise<void> => {
         setMessage("");
         if (timerRef.current !== null) {
             clearInterval(timerRef.current);
@@ -145,18 +142,18 @@ export default function Timer({
         endTimeRef.current = null;
         deactivateKeepAwake();
         await notifee.cancelAllNotifications(); // clear any previous pending
-    };
+    }, []);
 
     // Reset message to prevent accidental press
-    const resetMessage = (): void => {
+    const resetMessage = useCallback((): void => {
         setMessage("Hold for 1 second to reset");
         setTimeout(() => {
             setMessage("");
         }, 5000);
-    };
+    }, []);
 
     // Reset the timer
-    const reset = async (): Promise<void> => {
+    const reset = useCallback(async (): Promise<void> => {
         if (timerRef.current !== null) {
             clearInterval(timerRef.current);
         }
@@ -168,10 +165,10 @@ export default function Timer({
         setMessage("");
         deactivateKeepAwake();
         await notifee.cancelAllNotifications();
-    };
+    }, [focusTimer]);
 
     // Skip break function
-    const skip = async (): Promise<void> => {
+    const skip = useCallback(async (): Promise<void> => {
         // Clear existing interval if running
         if (timerRef.current !== null) {
             clearInterval(timerRef.current);
@@ -197,7 +194,7 @@ export default function Timer({
         } else {
             await notifee.cancelAllNotifications();
         }
-    };
+    }, [timerOn, focusTimer]);
 
     // Schedule notification when app is not active
     const scheduleNotification = async (
@@ -251,12 +248,7 @@ export default function Timer({
                 </View>
             </View>
             <View style={styles.timeView}>
-                <Text style={styles.timeText}>
-                    {String(minutes).padStart(2, "0")[0]}
-                    {String(minutes).padStart(2, "0")[1]}:
-                    {String(seconds).padStart(2, "0")[0]}
-                    {String(seconds).padStart(2, "0")[1]}
-                </Text>
+                <TimeDisplay totalSeconds={totalSeconds} />
             </View>
             <View style={styles.quoteView}>
                 <QuotePrinter />
@@ -310,11 +302,6 @@ const styles = StyleSheet.create({
     timeView: {
         flex: 2,
         justifyContent: "center",
-    },
-    timeText: {
-        ...textDefault,
-        fontSize: Sizes.timerTimeText,
-        fontVariant: ["tabular-nums"],
     },
     quoteView: { flex: 2, justifyContent: "center" },
     timerButtonsView: {
