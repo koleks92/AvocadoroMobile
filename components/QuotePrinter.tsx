@@ -1,6 +1,6 @@
 import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useAvocadoro } from "../store/AvocadoroContext";
 
@@ -9,7 +9,7 @@ type Quote = {
     author: string;
 };
 
-export default function QuotePrinter() {
+export default memo(function QuotePrinter() {
     const [quotes, setQuotes] = useState<Quote[]>([]);
     const [currentQuote, setCurrentQuote] = useState<Quote>();
 
@@ -57,14 +57,21 @@ export default function QuotePrinter() {
     if (currentQuote) {
         return (
             <View style={styles.root}>
-                <Text style={styles.quoteText} accessibilityLabel="quote-quote">{currentQuote.quote}</Text>
-                <Text style={styles.quoteAuthor} accessibilityLabel="quote-author">{currentQuote.author}</Text>
+                <Text style={styles.quoteText} accessibilityLabel="quote-quote">
+                    {currentQuote.quote}
+                </Text>
+                <Text
+                    style={styles.quoteAuthor}
+                    accessibilityLabel="quote-author"
+                >
+                    {currentQuote.author}
+                </Text>
             </View>
         );
     } else {
         return <View style={styles.root}></View>;
     }
-}
+});
 
 const styles = StyleSheet.create({
     root: {
@@ -81,6 +88,6 @@ const styles = StyleSheet.create({
         flex: 1,
         textAlign: "right",
         fontStyle: "italic",
-        fontSize: Sizes.quoteAuthor
+        fontSize: Sizes.quoteAuthor,
     },
 });
