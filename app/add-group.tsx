@@ -21,7 +21,7 @@ export default function AddGroup() {
     const router = useRouter();
 
     // Read values from the route
-    const { groupId, groupName, groupFocusTimer, groupBreakTimer } =
+    const { groupId, groupName, groupFocusTimer, groupBreakTimer, anonymous } =
         useLocalSearchParams();
 
     const { session, supabase, message, setMessage } = useAvocadoro();
@@ -33,6 +33,7 @@ export default function AddGroup() {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
+    const [anonymousMode, setAnonymousMode] = useState<boolean>(false);
     const [deleteView, setDeleteView] = useState<boolean>(false);
     const [id, setId] = useState<string>("");
 
@@ -50,6 +51,12 @@ export default function AddGroup() {
             setEditMode(true);
         }
     }, [groupId]);
+
+    useEffect(() => {
+        if (anonymous === "true") {
+            setAnonymousMode(true);
+        }
+    }, [anonymous]);
 
     // Make sure that UI catches up with the state update
     useEffect(() => {
@@ -153,6 +160,19 @@ export default function AddGroup() {
         }
     }
 
+    // Create anonymous session
+    function createAnonymousGroup(): void {
+        router.navigate({
+            pathname: "/group",
+            params: {
+                name: "",
+                focusTimer: focusTimer,
+                breakTimer: breakTimer,
+                anonymous: "true",
+            },
+        });
+    }
+
     if (loading) {
         return;
     }
@@ -179,28 +199,32 @@ export default function AddGroup() {
                                 }}
                             />
                         </View>
-                        <View style={styles.titleView}>
-                            <Text style={styles.titleText}>
-                                {editMode ? groupName : "Add Group"}
-                            </Text>
-                        </View>
-                        <View style={{ width: buttonWidth }}>
-                            {editMode && !deleteView && (
-                                <Button
-                                    title={
-                                        <MaterialIcons
-                                            name="delete-outline"
-                                            size={Sizes.buttonIcon}
+                        {!anonymousMode && (
+                            <>
+                                <View style={styles.titleView}>
+                                    <Text style={styles.titleText}>
+                                        {editMode ? groupName : "Add Group"}
+                                    </Text>
+                                </View>
+                                <View style={{ width: buttonWidth }}>
+                                    {editMode && !deleteView && (
+                                        <Button
+                                            title={
+                                                <MaterialIcons
+                                                    name="delete-outline"
+                                                    size={Sizes.buttonIcon}
+                                                />
+                                            }
+                                            onPress={() => {
+                                                setDeleteView(true);
+                                            }}
+                                            icon={true}
+                                            accessibilityLabel="delete-button"
                                         />
-                                    }
-                                    onPress={() => {
-                                        setDeleteView(true);
-                                    }}
-                                    icon={true}
-                                    accessibilityLabel="delete-button"
-                                />
-                            )}
-                        </View>
+                                    )}
+                                </View>
+                            </>
+                        )}
                     </View>
                     <View style={styles.middleView}>
                         {deleteView ? (
@@ -217,17 +241,19 @@ export default function AddGroup() {
                             </View>
                         ) : (
                             <>
-                                <View style={styles.nameView}>
-                                    <InputField
-                                        placeholder="Avocadoro name"
-                                        value={name}
-                                        onChangeText={(val) => {
-                                            setName(val);
-                                        }}
-                                        inputMode="text"
-                                        accessibilityLabel="name-field"
-                                    />
-                                </View>
+                                {!anonymousMode && (
+                                    <View style={styles.nameView}>
+                                        <InputField
+                                            placeholder="Avocadoro name"
+                                            value={name}
+                                            onChangeText={(val) => {
+                                                setName(val);
+                                            }}
+                                            inputMode="text"
+                                            accessibilityLabel="name-field"
+                                        />
+                                    </View>
+                                )}
                                 <View style={styles.timeView}>
                                     <Text style={styles.timeText}>
                                         Focus time in minutes
@@ -253,7 +279,7 @@ export default function AddGroup() {
                                     />
                                 </View>
                                 <View style={styles.buttonView}>
-                                    {editMode ? (
+                                    {editMode && (
                                         <Button
                                             title="Update"
                                             onPress={() => {
@@ -261,7 +287,17 @@ export default function AddGroup() {
                                             }}
                                             accessibilityLabel="update-button"
                                         />
-                                    ) : (
+                                    )}
+                                    {anonymousMode && (
+                                        <Button
+                                            title="Create"
+                                            onPress={() => {
+                                                createAnonymousGroup();
+                                            }}
+                                            accessibilityLabel="anonymous-button"
+                                        />
+                                    )}
+                                    {!anonymousMode && !editMode && (
                                         <Button
                                             title="Add"
                                             onPress={() => {
@@ -303,6 +339,7 @@ const styles = StyleSheet.create({
     },
     middleView: {
         flex: 1,
+        justifyContent: "flex-start",
     },
     nameView: {
         justifyContent: "center",
@@ -329,7 +366,7 @@ const styles = StyleSheet.create({
     },
     deleteView: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: "center",
     },
     deleteText: {
         ...textDefault,

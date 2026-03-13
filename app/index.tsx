@@ -69,7 +69,7 @@ export default function Index() {
                 }
             });
         });
-        
+
         setAuthLoaded(true);
 
         return () => listener.subscription.unsubscribe();
@@ -337,6 +337,18 @@ export default function Index() {
                                     </Text>
                                 </Pressable>
                             )}
+                            <Pressable
+                                onPress={() => {
+                                    router.navigate({
+                                        pathname: "/add-group",
+                                        params: { anonymous: "true" },
+                                    });
+                                }}
+                            >
+                                <Text style={styles.messageText}>
+                                    Continue without an account
+                                </Text>
+                            </Pressable>
                             <Text style={styles.messageText}>{message}</Text>
                         </View>
                     </View>

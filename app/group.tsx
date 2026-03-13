@@ -26,6 +26,7 @@ type SessionGroupProps = {
     focusTimer: string;
     breakTimer: string;
     totalMinutes: string;
+    anonymous: string;
 };
 
 export default function Group() {
@@ -39,7 +40,7 @@ export default function Group() {
     // Read the values from the route
     const params = useLocalSearchParams<SessionGroupProps>();
 
-    const [name, setName] = useState<string>(params.name || "Untitled");
+    const [name, setName] = useState<string>(params.name || "");
     const [focusTimer, setFocusTimer] = useState<number>(
         Number(params.focusTimer) || 25,
     );
@@ -54,6 +55,8 @@ export default function Group() {
 
     const [totalTime, setTotalTime] = useState<string>("");
 
+    const [anonymousMode, setAnonymousMode] = useState<boolean>(false);
+
     function convertTime(): void {
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
@@ -64,6 +67,12 @@ export default function Group() {
 
         setTotalTime(`${paddedHours}h ${paddedMinutes}m`);
     }
+
+    useEffect(() => {
+        if (params.anonymous === "true") {
+            setAnonymousMode(true);
+        }
+    }, [params]);
 
     // Cleanup message timer
     useEffect(() => {
@@ -125,20 +134,22 @@ export default function Group() {
         }
 
         // Insert data
-        const { data, error } = await supabase
-            .from("sessions")
-            .insert({
-                session_group_id: id,
-                duration_minutes: minutes,
-            })
-            .select();
+        if (!anonymousMode) {
+            const { data, error } = await supabase
+                .from("sessions")
+                .insert({
+                    session_group_id: id,
+                    duration_minutes: minutes,
+                })
+                .select();
+
+            if (error) {
+                setMessage(error.message);
+            }
+        }
 
         setAvocadoroAmount((prev) => prev + 1);
         setTotalMinutes((prev) => prev + focusTimer);
-
-        if (error) {
-            setMessage(error.message);
-        }
     };
 
     const messageTimer = (): void => {
@@ -166,36 +177,40 @@ export default function Group() {
                             }}
                         />
                     </View>
-                    <View style={styles.titleView}>
-                        <Text style={styles.titleText}>{name}</Text>
-                    </View>
-                    <View>
-                        <Button
-                            title={
-                                <Ionicons
-                                    name="pencil"
-                                    size={Sizes.buttonIcon}
+                    {!anonymousMode && (
+                        <>
+                            <View style={styles.titleView}>
+                                <Text style={styles.titleText}>{name}</Text>
+                            </View>
+                            <View>
+                                <Button
+                                    title={
+                                        <Ionicons
+                                            name="pencil"
+                                            size={Sizes.buttonIcon}
+                                        />
+                                    }
+                                    onPress={() => {
+                                        if (timerOn) {
+                                            messageTimer();
+                                        } else {
+                                            router.navigate({
+                                                pathname: "/add-group",
+                                                params: {
+                                                    groupId: id,
+                                                    groupName: name,
+                                                    groupFocusTimer: focusTimer,
+                                                    groupBreakTimer: breakTimer,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    icon={true}
+                                    accessibilityLabel="edit-button"
                                 />
-                            }
-                            onPress={() => {
-                                if (timerOn) {
-                                    messageTimer();
-                                } else {
-                                    router.navigate({
-                                        pathname: "/add-group",
-                                        params: {
-                                            groupId: id,
-                                            groupName: name,
-                                            groupFocusTimer: focusTimer,
-                                            groupBreakTimer: breakTimer,
-                                        },
-                                    });
-                                }
-                            }}
-                            icon={true}
-                            accessibilityLabel="edit-button"
-                        />
-                    </View>
+                            </View>
+                        </>
+                    )}
                 </View>
                 <View style={styles.middleView}>
                     <Animated.View
@@ -232,19 +247,21 @@ export default function Group() {
                     <Animated.View
                         style={[timerAnimatedStyle, styles.timerView]}
                     >
-                        <View style={styles.slideButtonView}>
-                            <Button
-                                title={
-                                    <Ionicons
-                                        name="chevron-down"
-                                        size={Sizes.buttonIcon}
-                                    />
-                                }
-                                icon={true}
-                                onPress={() => closeTimerOpenAvocadoro()}
-                                accessibilityLabel="down-button"
-                            />
-                        </View>
+                        {!anonymousMode && (
+                            <View style={styles.slideButtonView}>
+                                <Button
+                                    title={
+                                        <Ionicons
+                                            name="chevron-down"
+                                            size={Sizes.buttonIcon}
+                                        />
+                                    }
+                                    icon={true}
+                                    onPress={() => closeTimerOpenAvocadoro()}
+                                    accessibilityLabel="down-button"
+                                />
+                            </View>
+                        )}
                         <View style={styles.insideMiddleView}>
                             <Timer
                                 onComplete={(minutes) =>
@@ -281,6 +298,7 @@ const styles = StyleSheet.create({
     },
     middleView: {
         flex: 1,
+        justifyContent: "center",
         width: "100%",
     },
     slideButtonView: {
