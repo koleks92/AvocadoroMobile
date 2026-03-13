@@ -344,6 +344,7 @@ export default function Index() {
                                         params: { anonymous: "true" },
                                     });
                                 }}
+                                accessibilityLabel="anonymous-button"
                             >
                                 <Text style={styles.messageText}>
                                     Continue without an account
