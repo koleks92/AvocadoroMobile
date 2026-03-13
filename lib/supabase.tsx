@@ -11,11 +11,10 @@ const supabaseAnonKey: string = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    ...(Platform.OS !== 'web' ? { storage: AsyncStorage } : {}),
+    storage: AsyncStorage as any,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
-    lock: processLock,
   },
 })
 // Tells Supabase Auth to continuously refresh the session automatically
