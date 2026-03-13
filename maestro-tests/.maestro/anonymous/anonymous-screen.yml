@@ -1,0 +1,44 @@
+appId: com.koleks92.AvocadoroMobile 
+---
+## Make sure that app didn't log in automatically
+## To test the timer, use group/group-timer-correct
+- launchApp
+- assertVisible: "anonymous-button"
+- tapOn: "anonymous-button"
+- assertNotVisible: "Add Group"
+- assertVisible: "go-back-button"
+- assertVisible: "Focus time in minutes"
+- assertVisible: "Break time in minutes"
+- assertVisible:
+    text: "25"
+    index: 0
+- assertVisible:
+    text: "25"
+    index: 1
+- assertVisible:
+    text: "5"
+    index: 0
+- assertVisible:
+    text: "5"
+    index: 1
+- assertVisible:
+    text: "60"
+    index: 0
+- assertVisible:
+    text: "60"
+    index: 1
+- assertNotVisible:
+    text: "0"
+    index: 1
+- assertVisible: "Create"
+- tapOn: "Create"
+- assertVisible: "go-back-button"
+- assertNotVisible: "edit-button"
+- assertVisible: "Focus"
+- assertNotVisible: "down-button"
+- assertVisible: "25:00"
+- assertVisible: "quote-quote"
+- assertVisible: "quote-author"
+- assertVisible: "play-button"
+- assertVisible: "stop-button"
+- assertVisible: "reset-button"
