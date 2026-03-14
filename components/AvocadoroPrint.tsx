@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
 import RotatingLogo from "./UI/RotatingLogo";
 
@@ -24,7 +24,7 @@ export default function AvocadoroPrint({ amount }: AvocadoroPrintProps) {
                 data={Array(amount).fill(null)}
                 keyExtractor={(item, index) => index.toString()}
                 numColumns={10}
-                renderItem={() => (
+                renderItem={useCallback(() => (
                     <View
                         style={{
                             aspectRatio: 0.8,
@@ -33,7 +33,7 @@ export default function AvocadoroPrint({ amount }: AvocadoroPrintProps) {
                     >
                         <RotatingLogo />
                     </View>
-                )}
+                ), [logoWidth])}
             />
         </View>
     );
