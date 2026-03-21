@@ -14,15 +14,21 @@ import Button from "./UI/Button";
 type timerModeType = "focus" | "break";
 
 type TimerProps = {
-    onComplete: (minutes: number) => void;
+    onComplete: (minutes: number, finishTime: number) => void;
     focusTimer: number;
     breakTimer: number;
+    timerOnSupabase?: boolean;
+    finishTimeSupabase?: string;
+    sessionGroupId?: string;
 };
 
 export default function Timer({
     onComplete,
     focusTimer,
     breakTimer,
+    timerOnSupabase,
+    finishTimeSupabase,
+    sessionGroupId,
 }: TimerProps) {
     const [timerMode, setTimerMode] = useState<timerModeType>("focus");
     const [totalSeconds, setTotalSeconds] = useState<number>(focusTimer * 60);
@@ -30,7 +36,7 @@ export default function Timer({
     const timerRef = useRef<number | null>(null);
     const endTimeRef = useRef<number | null>(null);
 
-    const { timerOn, setTimerOn, setMessage } = useAvocadoro();
+    const { timerOn, setTimerOn, setMessage, supabase } = useAvocadoro();
 
     // Import sounds
     const breakTimeSound: AudioSource = require("@/assets/sounds/breakTime.mp3");
@@ -42,14 +48,79 @@ export default function Timer({
     // CHeck if app is active
     const [appIsActive, setAppIsActive] = useState(true);
 
-    // Notifee configuration and event listener for appIsActive
+    // Update database with timer_on = True and finish_date
+    const setTimerAndFinishTime = async (reset: boolean): Promise<void> => {
+        let newFinishTime: string;
+
+        if (reset) {
+            // Reset the total seconds
+            newFinishTime = new Date(
+                Date.now() + focusTimer * 60 * 1000,
+            ).toISOString();
+        } else {
+            // Kepp the total seconds
+            newFinishTime = new Date(
+                Date.now() + totalSeconds * 1000,
+            ).toISOString();
+        }
+
+
+        const { data, error } = await supabase
+            .from("session_groups")
+            .update({
+                timer_on: true,
+                finish_time: newFinishTime,
+            })
+            .eq("id", sessionGroupId);
+    };
+
+    // Update database with timer_on = False and finish_date = null
+    const unsetTimerAndFinishDate = async (): Promise<void> => {
+        const { data, error } = await supabase
+            .from("session_groups")
+            .update({
+                timer_on: false,
+                finish_time: null,
+            })
+            .eq("id", sessionGroupId);
+    };
+
     useEffect(() => {
+        // Check if timer is running on another device and start the timer
+        if (timerOnSupabase && finishTimeSupabase) {
+            const finishTime = new Date(finishTimeSupabase + "Z").getTime();
+            const remaining = Math.ceil((finishTime - Date.now()) / 1000);
+
+            if (remaining > 0) {
+                setTotalSeconds(remaining);
+                setTimerOn(true);
+                scheduleNotification(totalSeconds, timerMode);
+                endTimeRef.current = finishTime;
+                timerRef.current = window.setInterval(() => {
+                    if (endTimeRef.current === null) return;
+                    const remaining = Math.ceil(
+                        (endTimeRef.current - Date.now()) / 1000,
+                    );
+                    setTotalSeconds(Math.max(0, remaining));
+                }, 1000);
+                activateKeepAwakeAsync();
+            }
+
+            setMessage("Remeber to reset timer on another device!");
+            setTimeout(() => {
+                setMessage("");
+            }, 15000);
+        }
+
+        // Check if app is active,
         const subscription = AppState.addEventListener(
             "change",
             (nextState) => {
                 setAppIsActive(nextState === "active");
             },
         );
+
+        // Request permision for notifications
         const requestNotifee = async () => {
             await notifee.createChannel({
                 id: "avocadoro",
@@ -84,6 +155,7 @@ export default function Timer({
 
             setTimeout(() => {
                 if (timerMode === "break") {
+                    // Set focus mode, reset the timer and play the sounds/vibrations
                     setTimerMode("focus");
                     setTotalSeconds(focusTimer * 60);
                     // Calculate end time when app is inactive
@@ -92,8 +164,12 @@ export default function Timer({
                     focusPlayer.seekTo(0);
                     focusPlayer.play();
                     Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
+                    setTimerAndFinishTime(true);
                 } else {
-                    onComplete(focusTimer);
+                    // Set break mode, reset the timer and play the sounds/vibrations
+                    if (endTimeRef.current !== null) {
+                        onComplete(focusTimer, endTimeRef.current);
+                    }
                     setTimerMode("break");
                     setTotalSeconds(breakTimer * 60);
                     // Calculate end time when app is inactive
@@ -102,9 +178,11 @@ export default function Timer({
                     breakPlayer.seekTo(0);
                     breakPlayer.play();
                     Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
+                    unsetTimerAndFinishDate();
                 }
             }, 1000);
 
+            // Start the timer
             timerRef.current = window.setInterval(() => {
                 if (endTimeRef.current === null) return;
                 const remaining = Math.ceil(
@@ -130,6 +208,9 @@ export default function Timer({
             setTotalSeconds(Math.max(0, remaining));
         }, 1000);
         activateKeepAwakeAsync();
+
+        // Update database with timer_on = True and finish_date
+        setTimerAndFinishTime(false);
     }, [totalSeconds, timerMode, timerOn]);
 
     // Stop/Pause timer
@@ -142,6 +223,9 @@ export default function Timer({
         endTimeRef.current = null;
         deactivateKeepAwake();
         await notifee.cancelAllNotifications(); // clear any previous pending
+
+        // Update database with timer_on = False and finish_date = null
+        unsetTimerAndFinishDate();
     }, []);
 
     // Reset message to prevent accidental press
@@ -165,6 +249,9 @@ export default function Timer({
         setMessage("");
         deactivateKeepAwake();
         await notifee.cancelAllNotifications();
+
+        // Update database with timer_on = False and finish_date = null
+        unsetTimerAndFinishDate();
     }, [focusTimer]);
 
     // Skip break function
@@ -191,6 +278,8 @@ export default function Timer({
                 setTotalSeconds(Math.max(0, remaining));
             }, 1000);
             scheduleNotification(focusTimer * 60, "focus");
+            // Update database with timer_on = True and finish_date
+            setTimerAndFinishTime(true);
         } else {
             await notifee.cancelAllNotifications();
         }

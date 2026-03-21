@@ -33,6 +33,8 @@ export default function Group() {
     const router = useRouter();
 
     const { supabase, timerOn, message, setMessage } = useAvocadoro();
+    
+    const [loading, setLoading] = useState<boolean>(true);
 
     // Messages
     const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -40,6 +42,7 @@ export default function Group() {
     // Read the values from the route
     const params = useLocalSearchParams<SessionGroupProps>();
 
+    // States from the route
     const [name, setName] = useState<string>(params.name || "");
     const [focusTimer, setFocusTimer] = useState<number>(
         Number(params.focusTimer) || 25,
@@ -51,9 +54,15 @@ export default function Group() {
         Number(params.totalMinutes) || 0,
     );
     const [id, setId] = useState<string>(params.id || "");
-    const [avocadoroAmount, setAvocadoroAmount] = useState<number>(0);
 
+    // Timer state from supabase
+    const [timerOnSupabase, setTimerOnSupabase] = useState<boolean>(false);
+    const [finishTimeSupabase, setFinishTimeSupabase] = useState<string>("");
+
+    // Print states
+    const [avocadoroAmount, setAvocadoroAmount] = useState<number>(0);
     const [totalTime, setTotalTime] = useState<string>("");
+
 
     const [anonymousMode, setAnonymousMode] = useState<boolean>(false);
 
@@ -67,6 +76,25 @@ export default function Group() {
 
         setTotalTime(`${paddedHours}h ${paddedMinutes}m`);
     }
+
+    useEffect(() => {
+        const checkTimer = async (): Promise<void> => {
+            const { data, error } = await supabase
+                .from("session_groups")
+                .select("timer_on, finish_time")
+                .eq("id", id)
+                .single();
+
+            if (data?.timer_on) {
+                setTimerOnSupabase(data.timer_on);
+                setFinishTimeSupabase(data.finish_time);
+            }
+
+            setLoading(false);
+        };
+
+        checkTimer();
+    }, []);
 
     useEffect(() => {
         if (params.anonymous === "true") {
@@ -122,7 +150,7 @@ export default function Group() {
         avocadoroHeight.value = withTiming(0, timing);
     };
 
-    const onCompleteHandler = async (minutes: number): Promise<void> => {
+    const onCompleteHandler = async (minutes: number, finishTime: number): Promise<void> => {
         setMessage("");
 
         // TEST MODE
@@ -140,11 +168,16 @@ export default function Group() {
                 .insert({
                     session_group_id: id,
                     duration_minutes: minutes,
+                    finish_time: new Date(finishTime).toISOString()
                 })
                 .select();
 
             if (error) {
-                setMessage(error.message);
+                // setMessage(error.message);
+                setMessage("Cannot save data.\n Are you running a timer on another device ?");
+                setTimeout(() => {
+                    setMessage("")
+                }, 15000)
             }
         }
 
@@ -160,6 +193,10 @@ export default function Group() {
         setMessage("Reset the timer first!");
         return;
     };
+
+    if (loading) {
+        return null;
+    }
 
     return (
         <>
@@ -264,11 +301,14 @@ export default function Group() {
                         )}
                         <View style={styles.insideMiddleView}>
                             <Timer
-                                onComplete={(minutes) =>
-                                    onCompleteHandler(minutes)
+                                onComplete={(minutes, finishTime) =>
+                                    onCompleteHandler(minutes, finishTime)
                                 }
                                 focusTimer={focusTimer}
                                 breakTimer={breakTimer}
+                                sessionGroupId={id}
+                                timerOnSupabase={timerOnSupabase}
+                                finishTimeSupabase={finishTimeSupabase}
                             />
                             <Text style={styles.messageText}>{message}</Text>
                         </View>
