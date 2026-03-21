@@ -33,7 +33,7 @@ export default function Group() {
     const router = useRouter();
 
     const { supabase, timerOn, message, setMessage } = useAvocadoro();
-    
+
     const [loading, setLoading] = useState<boolean>(true);
 
     // Messages
@@ -62,7 +62,6 @@ export default function Group() {
     // Print states
     const [avocadoroAmount, setAvocadoroAmount] = useState<number>(0);
     const [totalTime, setTotalTime] = useState<string>("");
-
 
     const [anonymousMode, setAnonymousMode] = useState<boolean>(false);
 
@@ -150,7 +149,10 @@ export default function Group() {
         avocadoroHeight.value = withTiming(0, timing);
     };
 
-    const onCompleteHandler = async (minutes: number, finishTime: number): Promise<void> => {
+    const onCompleteHandler = async (
+        minutes: number,
+        finishTime: number,
+    ): Promise<void> => {
         setMessage("");
 
         // TEST MODE
@@ -168,16 +170,18 @@ export default function Group() {
                 .insert({
                     session_group_id: id,
                     duration_minutes: minutes,
-                    finish_time: new Date(finishTime).toISOString()
+                    finish_time: new Date(finishTime).toISOString(),
                 })
                 .select();
 
             if (error) {
                 // setMessage(error.message);
-                setMessage("Cannot save data.\n Are you running a timer on another device ?");
+                setMessage(
+                    "Cannot save data.\n Are you running a timer on another device ?",
+                );
                 setTimeout(() => {
-                    setMessage("")
-                }, 15000)
+                    setMessage("");
+                }, 15000);
             }
         }
 
@@ -310,7 +314,11 @@ export default function Group() {
                                 timerOnSupabase={timerOnSupabase}
                                 finishTimeSupabase={finishTimeSupabase}
                             />
-                            <Text style={styles.messageText}>{message}</Text>
+                            <View style={styles.messageView}>
+                                <Text style={styles.messageText}>
+                                    {message}
+                                </Text>
+                            </View>
                         </View>
                     </Animated.View>
                 </View>
@@ -370,6 +378,9 @@ const styles = StyleSheet.create({
     },
     insideMiddleView: {
         flex: 1,
+    },
+    messageView: {
+        height: "10%",
     },
     messageText: {
         ...textDefault,
