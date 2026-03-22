@@ -2,7 +2,7 @@ import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import notifee, { TriggerType } from "@notifee/react-native";
+import notifee from "@notifee/react-native";
 import { AudioSource, useAudioPlayer } from "expo-audio";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -10,6 +10,8 @@ import { AppState, StyleSheet, Text, Vibration, View } from "react-native";
 import QuotePrinter from "./QuotePrinter";
 import TimeDisplay from "./TimeDisplay";
 import Button from "./UI/Button";
+import { scheduleNotification, requestNotifee } from "@/util/scheduleNotification";
+import { setTimerAndFinishTime, unsetTimerAndFinishDate } from "@/util/timerAndFinishDate";
 
 type timerModeType = "focus" | "break";
 
@@ -48,43 +50,6 @@ export default function Timer({
     // CHeck if app is active
     const [appIsActive, setAppIsActive] = useState(true);
 
-    // Update database with timer_on = True and finish_date
-    const setTimerAndFinishTime = async (reset: boolean): Promise<void> => {
-        let newFinishTime: string;
-
-        if (reset) {
-            // Reset the total seconds
-            newFinishTime = new Date(
-                Date.now() + focusTimer * 60 * 1000,
-            ).toISOString();
-        } else {
-            // Kepp the total seconds
-            newFinishTime = new Date(
-                Date.now() + totalSeconds * 1000,
-            ).toISOString();
-        }
-
-
-        const { data, error } = await supabase
-            .from("session_groups")
-            .update({
-                timer_on: true,
-                finish_time: newFinishTime,
-            })
-            .eq("id", sessionGroupId);
-    };
-
-    // Update database with timer_on = False and finish_date = null
-    const unsetTimerAndFinishDate = async (): Promise<void> => {
-        const { data, error } = await supabase
-            .from("session_groups")
-            .update({
-                timer_on: false,
-                finish_time: null,
-            })
-            .eq("id", sessionGroupId);
-    };
-
     useEffect(() => {
         // Check if timer is running on another device and start the timer
         if (timerOnSupabase && finishTimeSupabase) {
@@ -121,15 +86,8 @@ export default function Timer({
         );
 
         // Request permision for notifications
-        const requestNotifee = async () => {
-            await notifee.createChannel({
-                id: "avocadoro",
-                name: "Avocadoro Timer",
-            });
-            await notifee.requestPermission();
-        };
-
         requestNotifee();
+
         return () => subscription.remove();
     }, []);
 
@@ -164,7 +122,7 @@ export default function Timer({
                     focusPlayer.seekTo(0);
                     focusPlayer.play();
                     Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
-                    setTimerAndFinishTime(true);
+                    setTimerAndFinishTime(supabase, true, focusTimer, totalSeconds, sessionGroupId as string);
                 } else {
                     // Set break mode, reset the timer and play the sounds/vibrations
                     if (endTimeRef.current !== null) {
@@ -178,7 +136,7 @@ export default function Timer({
                     breakPlayer.seekTo(0);
                     breakPlayer.play();
                     Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
-                    unsetTimerAndFinishDate();
+                    unsetTimerAndFinishDate(supabase, sessionGroupId as string);
                 }
             }, 1000);
 
@@ -210,7 +168,7 @@ export default function Timer({
         activateKeepAwakeAsync();
 
         // Update database with timer_on = True and finish_date
-        setTimerAndFinishTime(false);
+        setTimerAndFinishTime(supabase, false, focusTimer, totalSeconds, sessionGroupId as string);
     }, [totalSeconds, timerMode, timerOn]);
 
     // Stop/Pause timer
@@ -225,7 +183,7 @@ export default function Timer({
         await notifee.cancelAllNotifications(); // clear any previous pending
 
         // Update database with timer_on = False and finish_date = null
-        unsetTimerAndFinishDate();
+        unsetTimerAndFinishDate(supabase, sessionGroupId as string);
     }, []);
 
     // Reset message to prevent accidental press
@@ -251,7 +209,7 @@ export default function Timer({
         await notifee.cancelAllNotifications();
 
         // Update database with timer_on = False and finish_date = null
-        unsetTimerAndFinishDate();
+        unsetTimerAndFinishDate(supabase, sessionGroupId as string);
     }, [focusTimer]);
 
     // Skip break function
@@ -279,43 +237,11 @@ export default function Timer({
             }, 1000);
             scheduleNotification(focusTimer * 60, "focus");
             // Update database with timer_on = True and finish_date
-            setTimerAndFinishTime(true);
+            setTimerAndFinishTime(supabase, true, focusTimer, totalSeconds, sessionGroupId as string);
         } else {
             await notifee.cancelAllNotifications();
         }
     }, [timerOn, focusTimer]);
-
-    // Schedule notification when app is not active
-    const scheduleNotification = async (
-        seconds: number,
-        mode: "focus" | "break",
-    ) => {
-        await notifee.cancelAllNotifications(); // clear any previous pending
-
-        await notifee.createTriggerNotification(
-            {
-                title:
-                    mode === "focus"
-                        ? "✅ Focus session done!"
-                        : "☕ Break over!",
-                body:
-                    mode === "focus"
-                        ? "Click to start the break mode!"
-                        : "Click to start the focus mode!",
-                android: {
-                    channelId: "avocadoro",
-                    pressAction: { id: "default" },
-                },
-                ios: {
-                    sound: "default",
-                },
-            },
-            {
-                type: TriggerType.TIMESTAMP,
-                timestamp: Date.now() + seconds * 1000,
-            },
-        );
-    };
 
     return (
         <View style={styles.root}>
