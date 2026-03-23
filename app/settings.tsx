@@ -1,3 +1,4 @@
+import { deleteAccount } from "@/util/auth";
 import AnimatedRoot from "@/components/UI/AnimatedRoot";
 import Button from "@/components/UI/Button";
 import GoBackButton from "@/components/UI/GoBackButton";
@@ -18,14 +19,7 @@ export default function Settings() {
     const { supabase } = useAvocadoro();
 
     async function deleteAccountHandler(): Promise<void> {
-        const { error: rpcError } = await supabase.rpc("delete_user");
-
-        if (rpcError) {
-            console.error("Error deleting account via RPC:", rpcError.message);
-            return;
-        }
-
-        await supabase.auth.signOut();
+        await deleteAccount(supabase);
         router.navigate("/");
     }
 

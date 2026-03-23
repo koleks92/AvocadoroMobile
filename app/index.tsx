@@ -6,15 +6,15 @@ import ShakingLogo from "@/components/UI/ShakingLogo";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
-import { emailValidation, passwordValidation } from "@/util/validation";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
-    GoogleSignin,
-    isErrorWithCode,
-    statusCodes,
-} from "@react-native-google-signin/google-signin";
+    signInAppleHandler,
+    signInGoogleHandler,
+    signInHandler,
+    signUpHandler,
+} from "@/util/auth";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { JwtPayload } from "@supabase/supabase-js";
-import * as AppleAuthentication from "expo-apple-authentication";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -81,147 +81,6 @@ export default function Index() {
         }
     }, [session, authLoaded]);
 
-    // SignUp with email and password
-    const signUp = async (): Promise<void> => {
-        setMessage("");
-        Keyboard.dismiss();
-
-        // Email validation: must include "@" and "."
-        const emailIsValid = emailValidation(email);
-
-        // Password validation:
-        // must be >= 10 characters and contain at least 1 digit
-        const passwordIsValid = passwordValidation(password);
-
-        // Confirm password validation
-        // Must be the same as password
-        const confirmPasswordIsValid = password === passwordConfirm;
-
-        if (emailIsValid && passwordIsValid && confirmPasswordIsValid) {
-            const { data, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                setMessage(error.message);
-            }
-        } else {
-            if (!emailIsValid) {
-                setMessage("Incorrect email");
-                return;
-            }
-
-            if (!passwordIsValid) {
-                setMessage(
-                    "Password must be >= 10 characters and contain at least 1 digit",
-                );
-                return;
-            }
-
-            if (!confirmPasswordIsValid) {
-                setMessage("Passwords must be the same");
-                return;
-            }
-        }
-    };
-
-    // Email and password signin
-    const signIn = async (): Promise<void> => {
-        setMessage("");
-        Keyboard.dismiss();
-
-        // Email validation: must include "@" and "."
-        const emailIsValid = emailValidation(email);
-
-        // Password validation:
-        // must be >= 10 characters and contain at least 1 digit
-        const passwordIsValid = passwordValidation(password);
-
-        if (emailIsValid && passwordIsValid) {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (error) {
-                console.error("Signin error:", error);
-                setMessage(error.message);
-                return;
-            }
-
-            if (data) {
-                console.log("Signin success:", data);
-            }
-        } else {
-            if (!emailIsValid) {
-                setMessage("Incorrect email");
-                return;
-            }
-
-            if (!passwordIsValid) {
-                setMessage(
-                    "Password must be >= 10 characters and contain at least 1 digit",
-                );
-                return;
-            }
-        }
-    };
-
-    // Google signin
-    const googleSignIn = async (): Promise<void> => {
-        try {
-            await GoogleSignin.hasPlayServices();
-            const response = await GoogleSignin.signIn();
-            if (response.data?.idToken) {
-                const { data, error } = await supabase.auth.signInWithIdToken({
-                    provider: "google",
-                    token: response.data.idToken,
-                });
-
-                if (error) {
-                    setMessage("Error occured, please try again :)");
-                }
-            }
-        } catch (error) {
-            if (isErrorWithCode(error)) {
-                switch (error.code) {
-                    case statusCodes.IN_PROGRESS:
-                        break;
-                    case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-                        break;
-                    default:
-                        setMessage("Error occured, please try again :)");
-                }
-            } else {
-                setMessage("Error occured, please try again :)");
-            }
-        }
-    };
-
-    const appleSignIn = async (): Promise<void> => {
-        try {
-            const response = await AppleAuthentication.signInAsync({
-                requestedScopes: [
-                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                ],
-            });
-
-            if (response?.identityToken) {
-                const { data, error } = await supabase.auth.signInWithIdToken({
-                    provider: "apple",
-                    token: response.identityToken,
-                });
-
-                if (error) {
-                    setMessage("Error occured, please try again :)");
-                }
-            }
-        } catch (error) {
-            setMessage("Error occured, please try again :)");
-        }
-    };
-
     return (
         <>
             <AnimatedRoot />
@@ -284,7 +143,13 @@ export default function Index() {
                                     <Button
                                         title="Sign Up"
                                         onPress={() => {
-                                            signUp();
+                                            signUpHandler(
+                                                email,
+                                                password,
+                                                passwordConfirm,
+                                                supabase,
+                                                setMessage,
+                                            );
                                         }}
                                         accessibilityLabel="signup-button"
                                     />
@@ -294,7 +159,12 @@ export default function Index() {
                                     <Button
                                         title="Sign In"
                                         onPress={() => {
-                                            signIn();
+                                            signInHandler(
+                                                email,
+                                                password,
+                                                supabase,
+                                                setMessage,
+                                            );
                                         }}
                                         accessibilityLabel="signin-button"
                                     />
@@ -307,7 +177,12 @@ export default function Index() {
                                                 />
                                             }
                                             accessibilityLabel="google-button"
-                                            onPress={() => googleSignIn()}
+                                            onPress={() =>
+                                                signInGoogleHandler(
+                                                    supabase,
+                                                    setMessage,
+                                                )
+                                            }
                                             icon={true}
                                         />
                                         {Platform.OS === "ios" && (
@@ -318,7 +193,12 @@ export default function Index() {
                                                         size={Sizes.buttonIcon}
                                                     />
                                                 }
-                                                onPress={() => appleSignIn()}
+                                                onPress={() =>
+                                                    signInAppleHandler(
+                                                        supabase,
+                                                        setMessage,
+                                                    )
+                                                }
                                                 icon={true}
                                             />
                                         )}
