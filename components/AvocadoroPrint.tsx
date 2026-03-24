@@ -1,5 +1,6 @@
+import { FlashList } from "@shopify/flash-list";
 import { useCallback, useState } from "react";
-import { FlatList, View } from "react-native";
+import { View } from "react-native";
 import RotatingLogo from "./UI/RotatingLogo";
 
 type AvocadoroPrintProps = {
@@ -9,31 +10,32 @@ type AvocadoroPrintProps = {
 export default function AvocadoroPrint({ amount }: AvocadoroPrintProps) {
     const [logoWidth, setLogoWidth] = useState<number>(10);
 
+    const renderItem = useCallback(() => {
+        return (
+            <View
+                style={{
+                    aspectRatio: 0.8,
+                    width: logoWidth,
+                }}
+            >
+                <RotatingLogo />
+            </View>
+        );
+    }, [logoWidth]);
+
     return (
         <View
-            style={{
-                flex: 1,
-            }}
+        style={{flex: 1}}
             onLayout={(event) => {
                 const { width } = event.nativeEvent.layout;
                 setLogoWidth(width / 10);
             }}
         >
-            <FlatList
-                columnWrapperStyle={{ justifyContent: "flex-start" }}
+            <FlashList
                 data={Array(amount).fill(null)}
                 keyExtractor={(item, index) => index.toString()}
                 numColumns={10}
-                renderItem={useCallback(() => (
-                    <View
-                        style={{
-                            aspectRatio: 0.8,
-                            width: logoWidth,
-                        }}
-                    >
-                        <RotatingLogo />
-                    </View>
-                ), [logoWidth])}
+                renderItem={renderItem}
             />
         </View>
     );

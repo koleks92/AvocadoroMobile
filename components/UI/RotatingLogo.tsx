@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import Animated, {
     useAnimatedStyle,
@@ -7,7 +7,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 
-export default function RotatingLogo() {
+export default memo(function RotatingLogo() {
     const rotate = useSharedValue(0);
 
     const handlePress = () => {
@@ -42,7 +42,7 @@ export default function RotatingLogo() {
             />
         </Pressable>
     );
-}
+});
 
 const styles = StyleSheet.create({
     logo: {
