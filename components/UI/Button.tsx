@@ -9,11 +9,12 @@ interface ButtonProps {
     onPress: () => void;
     onLongPress?: () => void;
     icon?: boolean;
+    iconNoSpace?: boolean;
     timer?: boolean;
     noSpace?: boolean;
     isSelected?: boolean;
     accessibilityLabel?: string;
-    deleteButton?: boolean
+    deleteButton?: boolean;
 }
 
 export default function Button({
@@ -21,11 +22,12 @@ export default function Button({
     onPress,
     onLongPress,
     icon,
+    iconNoSpace,
     timer,
     noSpace,
     isSelected,
     accessibilityLabel,
-    deleteButton
+    deleteButton,
 }: ButtonProps) {
     return (
         <Pressable
@@ -36,10 +38,11 @@ export default function Button({
                 styles.root,
                 pressed ? styles.pressed : null,
                 icon ? styles.icon : null,
+                iconNoSpace ? styles.iconNoSpace : null,
                 timer ? styles.timer : null,
                 isSelected ? styles.selected : null,
                 deleteButton ? styles.delete : null,
-                noSpace ? styles.noSpace : null
+                noSpace ? styles.noSpace : null,
             ]}
             accessibilityLabel={accessibilityLabel}
         >
@@ -64,6 +67,13 @@ const styles = StyleSheet.create({
         width: Sizes.smallButtonHeight,
         height: Sizes.smallButtonHeight,
     },
+    iconNoSpace: {
+        borderRadius: Sizes.smallButtonHeight / 2,
+        width: Sizes.smallButtonHeight,
+        height: Sizes.smallButtonHeight,
+        margin: 0,
+        padding: 0,
+    },
     timer: {
         margin: 0,
     },
@@ -84,6 +94,6 @@ const styles = StyleSheet.create({
         fontSize: Sizes.buttonFont,
     },
     delete: {
-        backgroundColor: Colors.red
-    }
+        backgroundColor: Colors.red,
+    },
 });
