@@ -16,7 +16,6 @@ import Animated, {
     Easing,
     useAnimatedStyle,
     useSharedValue,
-    withDelay,
     withTiming,
 } from "react-native-reanimated";
 
@@ -113,40 +112,42 @@ export default function Group() {
         convertTime();
     }, [totalMinutes]);
 
-    // Shared values
-    const timerHeight = useSharedValue(100);
-    const timerOpacity = useSharedValue(100);
-    const avocadoroHeight = useSharedValue(0);
+    // Shared values — translate instead of height
+    const timerTranslateY = useSharedValue(0);
+    const timerOpacity = useSharedValue(1);
+    const avocadoroTranslateY = useSharedValue(1000); // starts offscreen below
     const avocadoroOpacity = useSharedValue(0);
 
-    // Animated styles
     const timerAnimatedStyle = useAnimatedStyle(() => ({
-        height: `${timerHeight.value}%`,
+        transform: [{ translateY: timerTranslateY.value }],
         opacity: timerOpacity.value,
     }));
 
     const avocadoroAnimatedStyle = useAnimatedStyle(() => ({
-        height: `${avocadoroHeight.value}%`,
+        transform: [{ translateY: avocadoroTranslateY.value }],
         opacity: avocadoroOpacity.value,
     }));
 
-    const timing = { duration: 500, easing: Easing.inOut(Easing.ease) };
+    const OpacityTiming = { duration: 500, easing: Easing.inOut(Easing.ease) };
+    const TranslateTiming = {
+        duration: 1000,
+        easing: Easing.inOut(Easing.ease),
+    };
 
     const closeTimerOpenAvocadoro = () => {
-        timerHeight.value = withTiming(0, timing);
-        timerOpacity.value = withTiming(0, { duration: 100 });
-        avocadoroHeight.value = withTiming(100, timing);
-        avocadoroOpacity.value = withDelay(
-            100,
-            withTiming(1, { duration: 100 }),
-        );
+        timerOpacity.value = withTiming(0, OpacityTiming);
+        timerTranslateY.value = withTiming(1000, TranslateTiming); // slide down out
+
+        avocadoroOpacity.value = withTiming(1, OpacityTiming);
+        avocadoroTranslateY.value = withTiming(0, TranslateTiming); // slide up into view
     };
 
     const openTimerCloseAvocadoro = () => {
-        timerHeight.value = withTiming(100, timing);
-        timerOpacity.value = withDelay(100, withTiming(1, { duration: 100 }));
-        avocadoroOpacity.value = withTiming(0, { duration: 100 });
-        avocadoroHeight.value = withTiming(0, timing);
+        avocadoroOpacity.value = withTiming(0, OpacityTiming);
+        avocadoroTranslateY.value = withTiming(1000, TranslateTiming); // slide down out
+
+        timerOpacity.value = withTiming(1, OpacityTiming);
+        timerTranslateY.value = withTiming(0, TranslateTiming); // slide up into view
     };
 
     const onCompleteHandler = async (
@@ -255,38 +256,11 @@ export default function Group() {
                 </View>
                 <View style={styles.middleView}>
                     <Animated.View
-                        style={[avocadoroAnimatedStyle, styles.avocadoroView]}
-                    >
-                        <View style={styles.insideMiddleView}>
-                            <View style={styles.totalTimeView}>
-                                <Text style={styles.totalTimeLabel}>
-                                    Total focus time
-                                </Text>
-                                <Text style={styles.totalTimeValue}>
-                                    {totalTime}
-                                </Text>
-                            </View>
-                            <AvocadoroPrint amount={avocadoroAmount} />
-                        </View>
-                        <Text style={styles.messageText}>{message}</Text>
-                        <View style={styles.slideButtonView}>
-                            <Button
-                                title={
-                                    <Ionicons
-                                        name="chevron-up"
-                                        size={Sizes.buttonIcon}
-                                    />
-                                }
-                                icon={true}
-                                onPress={() => {
-                                    openTimerCloseAvocadoro();
-                                }}
-                                accessibilityLabel="up-button"
-                            />
-                        </View>
-                    </Animated.View>
-                    <Animated.View
-                        style={[timerAnimatedStyle, styles.timerView]}
+                        style={[
+                            StyleSheet.absoluteFill,
+                            avocadoroAnimatedStyle,
+                            styles.avocadoroView,
+                        ]}
                     >
                         {!anonymousMode && (
                             <View style={styles.slideButtonView}>
@@ -297,7 +271,46 @@ export default function Group() {
                                             size={Sizes.buttonIcon}
                                         />
                                     }
-                                    icon={true}
+                                    iconNoSpace={true}
+                                    onPress={() => {
+                                        openTimerCloseAvocadoro();
+                                    }}
+                                    accessibilityLabel="down-button"
+                                />
+                            </View>
+                        )}
+                        <View style={styles.insideMiddleView}>
+                            <View style={styles.totalTimeView}>
+                                <Text style={styles.totalTimeLabel}>
+                                    Total focus time
+                                </Text>
+                                <Text style={styles.totalTimeValue}>
+                                    {totalTime}
+                                </Text>
+                            </View>
+                            <AvocadoroPrint amount={avocadoroAmount} />
+                        <View style={styles.messageView}>
+                            <Text style={styles.messageText}>{message}</Text>
+                        </View>
+                        </View>
+                    </Animated.View>
+                    <Animated.View
+                        style={[
+                            StyleSheet.absoluteFill,
+                            timerAnimatedStyle,
+                            styles.timerView,
+                        ]}
+                    >
+                        {!anonymousMode && (
+                            <View style={styles.slideButtonView}>
+                                <Button
+                                    title={
+                                        <Ionicons
+                                            name="chevron-down"
+                                            size={Sizes.buttonIcon}
+                                        />
+                                    }
+                                    iconNoSpace={true}
                                     onPress={() => closeTimerOpenAvocadoro()}
                                     accessibilityLabel="down-button"
                                 />
@@ -348,6 +361,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         width: "100%",
+        overflow: "hidden",
     },
     slideButtonView: {
         alignItems: "center",
@@ -358,6 +372,7 @@ const styles = StyleSheet.create({
     avocadoroView: {
         backgroundColor: Colors.background2,
         overflow: "hidden",
+        height: "100%",
     },
     totalTimeView: {
         justifyContent: "center",
@@ -375,6 +390,7 @@ const styles = StyleSheet.create({
     },
     timerView: {
         overflow: "hidden",
+        height: "100%",
     },
     insideMiddleView: {
         flex: 1,
