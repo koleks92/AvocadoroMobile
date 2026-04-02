@@ -8,6 +8,9 @@ import {
     useState,
 } from "react";
 
+type timerModeType = "focus" | "break";
+
+
 // Define the shape of the context value
 type AvocadoroContextType = {
     supabase: SupabaseClient;
@@ -17,6 +20,8 @@ type AvocadoroContextType = {
     setTimerOn: React.Dispatch<React.SetStateAction<boolean>>;
     message: string;
     setMessage: React.Dispatch<React.SetStateAction<string>>;
+    timerMode: timerModeType;
+    setTimerMode: React.Dispatch<React.SetStateAction<timerModeType>>;
 };
 
 // Create the context (default: null so we can handle initialization)
@@ -42,6 +47,7 @@ export function AvocadoroProvider({ children }: AvocadoroProviderProps) {
     const [session, setSession] = useState<Session | null>(null);
     const [timerOn, setTimerOn] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
+    const [timerMode, setTimerMode] = useState<timerModeType>("focus");
 
     useEffect(() => {
         supabase.auth
@@ -57,7 +63,7 @@ export function AvocadoroProvider({ children }: AvocadoroProviderProps) {
 
     return (
         <AvocadoroContext.Provider
-            value={{ supabase, session, setSession, timerOn, setTimerOn, message, setMessage }}
+            value={{ supabase, session, setSession, timerOn, setTimerOn, message, setMessage, timerMode, setTimerMode }}
         >
             {children}
         </AvocadoroContext.Provider>
