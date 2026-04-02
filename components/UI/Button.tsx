@@ -15,6 +15,7 @@ interface ButtonProps {
     isSelected?: boolean;
     accessibilityLabel?: string;
     deleteButton?: boolean;
+    withBackground?: boolean;
 }
 
 export default function Button({
@@ -28,6 +29,7 @@ export default function Button({
     isSelected,
     accessibilityLabel,
     deleteButton,
+    withBackground,
 }: ButtonProps) {
     return (
         <Pressable
@@ -43,6 +45,7 @@ export default function Button({
                 isSelected ? styles.selected : null,
                 deleteButton ? styles.delete : null,
                 noSpace ? styles.noSpace : null,
+                withBackground ? styles.withBackground : null,
             ]}
             accessibilityLabel={accessibilityLabel}
         >
@@ -56,7 +59,6 @@ const styles = StyleSheet.create({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        //      backgroundColor: Colors.primaryGreen,
         borderRadius: Sizes.buttonBorderRadius,
         padding: Sizes.buttonPadding,
         height: Sizes.buttonInputHeight,
@@ -95,5 +97,8 @@ const styles = StyleSheet.create({
     },
     delete: {
         backgroundColor: Colors.red,
+    },
+    withBackground: {
+        backgroundColor: Colors.primaryGreen,
     },
 });
