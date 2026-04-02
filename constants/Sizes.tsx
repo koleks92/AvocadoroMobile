@@ -78,5 +78,10 @@ export const Sizes = {
 
     // QuotePrinter component
     quoteText: windowSize * 0.044,
-    quoteAuthor: windowSize * 0.04
+    quoteAuthor: windowSize * 0.04, 
+
+    // Modal
+    modalTextMargin: windowSize * 0.08,
+    modalTextSize: windowSize * 0.04,
+    modalTitleText: windowSize * 0.06
 };
