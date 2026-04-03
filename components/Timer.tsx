@@ -1,6 +1,10 @@
 import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
+import {
+    requestNotifee,
+    scheduleNotification,
+} from "@/util/scheduleNotification";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import notifee from "@notifee/react-native";
 import { AudioSource, useAudioPlayer } from "expo-audio";
@@ -10,35 +14,32 @@ import { AppState, StyleSheet, Text, Vibration, View } from "react-native";
 import QuotePrinter from "./QuotePrinter";
 import TimeDisplay from "./TimeDisplay";
 import Button from "./UI/Button";
-import { scheduleNotification, requestNotifee } from "@/util/scheduleNotification";
-import { setTimerAndFinishTime, unsetTimerAndFinishDate } from "@/util/timerAndFinishDate";
-
-type timerModeType = "focus" | "break";
 
 type TimerProps = {
     onComplete: (minutes: number, finishTime: number) => void;
     focusTimer: number;
     breakTimer: number;
-    timerOnSupabase?: boolean;
-    finishTimeSupabase?: string;
-    sessionGroupId?: string;
+    supabaseId?: string;
+    supabaseFinishTime?: string;
+    onTotalSecondsChange?: (seconds: number) => void;
+    transferRecived?: boolean;
 };
 
 export default function Timer({
     onComplete,
     focusTimer,
     breakTimer,
-    timerOnSupabase,
-    finishTimeSupabase,
-    sessionGroupId,
+    supabaseId,
+    supabaseFinishTime,
+    onTotalSecondsChange,
+    transferRecived,
 }: TimerProps) {
-    const [timerMode, setTimerMode] = useState<timerModeType>("focus");
     const [totalSeconds, setTotalSeconds] = useState<number>(focusTimer * 60);
 
     const timerRef = useRef<number | null>(null);
     const endTimeRef = useRef<number | null>(null);
 
-    const { timerOn, setTimerOn, setMessage, supabase } = useAvocadoro();
+    const { timerOn, setTimerOn, setMessage, supabase, timerMode, setTimerMode } = useAvocadoro();
 
     // Import sounds
     const breakTimeSound: AudioSource = require("@/assets/sounds/breakTime.mp3");
@@ -51,32 +52,10 @@ export default function Timer({
     const [appIsActive, setAppIsActive] = useState(true);
 
     useEffect(() => {
-        // Check if timer is running on another device and start the timer
-        if (timerOnSupabase && finishTimeSupabase) {
-            const finishTime = new Date(finishTimeSupabase + "Z").getTime();
-            const remaining = Math.ceil((finishTime - Date.now()) / 1000);
+        if (transferRecived) reset();
+    }, [transferRecived]);
 
-            if (remaining > 0) {
-                setTotalSeconds(remaining);
-                setTimerOn(true);
-                scheduleNotification(totalSeconds, timerMode);
-                endTimeRef.current = finishTime;
-                timerRef.current = window.setInterval(() => {
-                    if (endTimeRef.current === null) return;
-                    const remaining = Math.ceil(
-                        (endTimeRef.current - Date.now()) / 1000,
-                    );
-                    setTotalSeconds(Math.max(0, remaining));
-                }, 1000);
-                activateKeepAwakeAsync();
-            }
-
-            setMessage("Remeber to reset timer on another device!");
-            setTimeout(() => {
-                setMessage("");
-            }, 15000);
-        }
-
+    useEffect(() => {
         // Check if app is active,
         const subscription = AppState.addEventListener(
             "change",
@@ -92,6 +71,27 @@ export default function Timer({
     }, []);
 
     useEffect(() => {
+        if (supabaseFinishTime && supabaseId) {
+            const finishTime = new Date(supabaseFinishTime + "Z").getTime();
+            const remaining = Math.ceil((finishTime - Date.now()) / 1000);
+
+            if (remaining > 0) {
+                if (timerRef.current !== null) return;
+                setTotalSeconds(remaining);
+                setTimerOn(true);
+                endTimeRef.current = finishTime; // set AFTER start so it doesn't get overwritten
+                timerRef.current = window.setInterval(() => {
+                    if (endTimeRef.current === null) return;
+                    const remaining = Math.ceil(
+                        (endTimeRef.current - Date.now()) / 1000,
+                    );
+                    setTotalSeconds(Math.max(0, remaining));
+                }, 1000);
+            }
+        }
+    }, [supabaseFinishTime]);
+
+    useEffect(() => {
         // If timer is off
         if (timerRef.current === null) return;
 
@@ -103,6 +103,9 @@ export default function Timer({
         if (totalSeconds === 3 && appIsActive) {
             cancelNotification();
         }
+
+        // Pass to parent component
+        onTotalSecondsChange?.(totalSeconds);
 
         // Timer functions
         if (totalSeconds === 0 && appIsActive) {
@@ -122,7 +125,6 @@ export default function Timer({
                     focusPlayer.seekTo(0);
                     focusPlayer.play();
                     Vibration.vibrate([0, 500, 500, 500, 500, 500, 500, 500]);
-                    setTimerAndFinishTime(supabase, true, focusTimer, totalSeconds, sessionGroupId as string);
                 } else {
                     // Set break mode, reset the timer and play the sounds/vibrations
                     if (endTimeRef.current !== null) {
@@ -136,7 +138,6 @@ export default function Timer({
                     breakPlayer.seekTo(0);
                     breakPlayer.play();
                     Vibration.vibrate([250, 500, 1000, 500, 1000, 500]);
-                    unsetTimerAndFinishDate(supabase, sessionGroupId as string);
                 }
             }, 1000);
 
@@ -166,9 +167,6 @@ export default function Timer({
             setTotalSeconds(Math.max(0, remaining));
         }, 1000);
         activateKeepAwakeAsync();
-
-        // Update database with timer_on = True and finish_date
-        setTimerAndFinishTime(supabase, false, focusTimer, totalSeconds, sessionGroupId as string);
     }, [totalSeconds, timerMode, timerOn]);
 
     // Stop/Pause timer
@@ -181,9 +179,6 @@ export default function Timer({
         endTimeRef.current = null;
         deactivateKeepAwake();
         await notifee.cancelAllNotifications(); // clear any previous pending
-
-        // Update database with timer_on = False and finish_date = null
-        unsetTimerAndFinishDate(supabase, sessionGroupId as string);
     }, []);
 
     // Reset message to prevent accidental press
@@ -207,9 +202,6 @@ export default function Timer({
         setMessage("");
         deactivateKeepAwake();
         await notifee.cancelAllNotifications();
-
-        // Update database with timer_on = False and finish_date = null
-        unsetTimerAndFinishDate(supabase, sessionGroupId as string);
     }, [focusTimer]);
 
     // Skip break function
@@ -236,8 +228,6 @@ export default function Timer({
                 setTotalSeconds(Math.max(0, remaining));
             }, 1000);
             scheduleNotification(focusTimer * 60, "focus");
-            // Update database with timer_on = True and finish_date
-            setTimerAndFinishTime(supabase, true, focusTimer, totalSeconds, sessionGroupId as string);
         } else {
             await notifee.cancelAllNotifications();
         }

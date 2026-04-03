@@ -7,11 +7,12 @@ import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
+import { cancelTransfer, finishTransfer, startTransfer } from "@/util/startFinishTransfer";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-
+import { Modal, StyleSheet, Text, View } from "react-native";
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -28,12 +29,19 @@ type SessionGroupProps = {
     anonymous: string;
 };
 
+type TransferTypes = "Recive" | "Send";
+
 export default function Group() {
     const router = useRouter();
 
-    const { supabase, timerOn, message, setMessage } = useAvocadoro();
+    const { supabase, timerOn, message, setMessage, timerMode } =
+        useAvocadoro();
 
-    const [loading, setLoading] = useState<boolean>(true);
+    // Modal
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [transferStatus, setTransferStatus] =
+        useState<TransferTypes>("Recive");
+    const [transferStatusText, setTransferStatusText] = useState<string>("");
 
     // Messages
     const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -55,14 +63,28 @@ export default function Group() {
     const [id, setId] = useState<string>(params.id || "");
 
     // Timer state from supabase
-    const [timerOnSupabase, setTimerOnSupabase] = useState<boolean>(false);
-    const [finishTimeSupabase, setFinishTimeSupabase] = useState<string>("");
+    const [supabaseFinishTime, setSupabaseFinishTime] = useState<string>("");
+
+    // Timer state
+    const [totalSeconds, setTotalSeconds] = useState<number>(0);
 
     // Print states
     const [avocadoroAmount, setAvocadoroAmount] = useState<number>(0);
     const [totalTime, setTotalTime] = useState<string>("");
 
     const [anonymousMode, setAnonymousMode] = useState<boolean>(false);
+
+    // Supabase realtime database chanell
+    const transferChannelRef = useRef<any>(null);
+
+    // Transfer status
+    const [transferRecived, setTransferRecived] = useState<boolean>(false);
+
+    // Root animated style
+    const rootOpacity = useSharedValue(1);
+    const rootAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: rootOpacity.value,
+    }));
 
     function convertTime(): void {
         const hours = Math.floor(totalMinutes / 60);
@@ -76,23 +98,22 @@ export default function Group() {
     }
 
     useEffect(() => {
-        const checkTimer = async (): Promise<void> => {
-            const { data, error } = await supabase
-                .from("session_groups")
-                .select("timer_on, finish_time")
-                .eq("id", id)
-                .single();
+        if (modalVisible) {
+            rootOpacity.value = 0.5;
+        } else {
+            rootOpacity.value = 1;
+        }
 
-            if (data?.timer_on) {
-                setTimerOnSupabase(data.timer_on);
-                setFinishTimeSupabase(data.finish_time);
-            }
+        if (!timerOn) {
+            setTransferStatus("Recive");
+            setTransferStatusText("Ready to recive timer!");
+        }
 
-            setLoading(false);
-        };
-
-        checkTimer();
-    }, []);
+        if (timerOn) {
+            setTransferStatus("Send");
+            setTransferStatusText("Ready to send timer!");
+        }
+    }, [modalVisible]);
 
     useEffect(() => {
         if (params.anonymous === "true") {
@@ -102,6 +123,20 @@ export default function Group() {
 
     // Cleanup message timer
     useEffect(() => {
+        const checkTimer = async (): Promise<void> => {
+            const { data, error } = await supabase
+                .from("session_groups")
+                .select("timer_on, finish_time")
+                .eq("id", id)
+                .single();
+
+            if (data?.timer_on) {
+                setModalVisible(true);
+            }
+        };
+
+        checkTimer();
+
         return () => {
             if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
         };
@@ -111,6 +146,72 @@ export default function Group() {
         setAvocadoroAmount(Math.floor(totalMinutes / focusTimer));
         convertTime();
     }, [totalMinutes]);
+
+    // Transfer function
+    const transferTimer = async (): Promise<void> => {
+        if (transferStatus === "Recive") {
+            const { data, error } = await supabase
+                .from("session_groups")
+                .select("timer_on, finish_time")
+                .eq("id", id)
+                .single();
+
+            if (data?.timer_on) {
+                setSupabaseFinishTime(data.finish_time);
+                finishTransfer(supabase, id);
+                setModalVisible(false);
+            } else {
+                setTransferStatusText("Transfer failed!\nTry again!");
+            }
+        }
+
+        if (transferStatus === "Send") {
+            if (timerMode === "focus") {
+                startTransfer(supabase, totalSeconds, id);
+                setTransferStatusText("Sending...");
+
+                // Start listening
+                transferChannelRef.current = supabase
+                    .channel("transfer-channel")
+                    .on(
+                        "postgres_changes",
+                        {
+                            event: "UPDATE",
+                            schema: "public",
+                            table: "session_groups",
+                            filter: `id=eq.${id}`,
+                        },
+                        (payload) => {
+                            if (payload.new.transfer_status === "recived") {
+                                setModalVisible(false);
+                                stopListening();
+                                setTransferRecived(true);
+                                setTimeout(() => {
+                                    setTransferRecived(false);
+                                }, 5000);
+                            }
+                        },
+                    )
+                    .subscribe();
+
+                // Stop after 30 seconds
+                setTimeout(() => {
+                    stopListening();
+                    cancelTransfer(supabase, id);
+                    setTransferStatusText("Transfer failed!\nTry again!");
+                }, 30000);
+            } else {
+                setTransferStatusText("Cannot transfer break!")
+            }
+        }
+    };
+
+    const stopListening = () => {
+        if (transferChannelRef.current) {
+            supabase.removeChannel(transferChannelRef.current);
+            transferChannelRef.current = null;
+        }
+    };
 
     // Shared values — translate instead of height
     const timerTranslateY = useSharedValue(0);
@@ -199,14 +300,70 @@ export default function Group() {
         return;
     };
 
-    if (loading) {
-        return null;
-    }
-
     return (
         <>
             <AnimatedRoot />
-            <View style={styles.root}>
+            {/* Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View style={styles.modalRoot}>
+                    <View style={styles.modalInnerView}>
+                        <View style={styles.topView}>
+                            <View>
+                                <Button
+                                    title={
+                                        <Ionicons
+                                            name="close"
+                                            size={Sizes.buttonIcon}
+                                        />
+                                    }
+                                    onPress={() => {
+                                        setModalVisible(false);
+                                    }}
+                                />
+                            </View>
+                            <View style={styles.modalTitleView}>
+                                <Text style={styles.modalTitleText}>
+                                    Transfer
+                                </Text>
+                            </View>
+                            <View pointerEvents="none" style={{ opacity: 0 }}>
+                                <Button
+                                    title={
+                                        <Ionicons
+                                            name="close"
+                                            size={Sizes.buttonIcon}
+                                        />
+                                    }
+                                    onPress={() => {
+                                        setModalVisible(false);
+                                    }}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.modalMiddleView}>
+                            <Button
+                                title={transferStatus}
+                                onPress={() => transferTimer()}
+                                withBackground={true}
+                            />
+                            <View>
+                                <Text style={styles.modalText}>
+                                    {transferStatusText}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* Group Screen */}
+            <Animated.View style={[styles.root, rootAnimatedStyle]}>
                 <View style={styles.topView}>
                     <View>
                         <GoBackButton
@@ -289,9 +446,11 @@ export default function Group() {
                                 </Text>
                             </View>
                             <AvocadoroPrint amount={avocadoroAmount} />
-                        <View style={styles.messageView}>
-                            <Text style={styles.messageText}>{message}</Text>
-                        </View>
+                            <View style={styles.messageView}>
+                                <Text style={styles.messageText}>
+                                    {message}
+                                </Text>
+                            </View>
                         </View>
                     </Animated.View>
                     <Animated.View
@@ -323,25 +482,77 @@ export default function Group() {
                                 }
                                 focusTimer={focusTimer}
                                 breakTimer={breakTimer}
-                                sessionGroupId={id}
-                                timerOnSupabase={timerOnSupabase}
-                                finishTimeSupabase={finishTimeSupabase}
+                                supabaseId={id}
+                                supabaseFinishTime={supabaseFinishTime}
+                                onTotalSecondsChange={(seconds) =>
+                                    setTotalSeconds(seconds)
+                                }
+                                transferRecived={transferRecived}
                             />
-                            <View style={styles.messageView}>
-                                <Text style={styles.messageText}>
-                                    {message}
-                                </Text>
+                            <View style={styles.bottomView}>
+                                <View style={styles.bottomButtonView}>
+                                    <Button
+                                        title={
+                                            <MaterialIcons
+                                                name="transfer-within-a-station"
+                                                size={Sizes.buttonIcon}
+                                            />
+                                        }
+                                        icon={true}
+                                        onPress={() => setModalVisible(true)}
+                                        accessibilityLabel="down-button"
+                                    />
+                                </View>
+                                <View style={styles.messageView}>
+                                    <Text style={styles.messageText}>
+                                        {message}
+                                    </Text>
+                                </View>
                             </View>
                         </View>
                     </Animated.View>
                 </View>
-            </View>
+            </Animated.View>
         </>
     );
 }
 
 const styles = StyleSheet.create({
     root: rootStyles,
+    modalRoot: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalInnerView: {
+        ...rootStyles,
+        flex: undefined,
+        justifyContent: "center",
+        alignItems: "center",
+        width: "75%",
+        height: "40%",
+    },
+    modalMiddleView: {
+        flex: 1,
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    modalTitleView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    modalTitleText: {
+        ...textDefault,
+        fontSize: Sizes.modalTitleText,
+    },
+    modalText: {
+        ...textDefault,
+        margin: Sizes.modalTextMargin,
+        textAlign: "center",
+        fontSize: Sizes.modalTextSize,
+    },
     topView: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -395,8 +606,16 @@ const styles = StyleSheet.create({
     insideMiddleView: {
         flex: 1,
     },
+    bottomView: {
+        flexDirection: "row",
+        width: "100%",
+        alignItems: "center",
+    },
+    bottomButtonView: {
+        width: "20%",
+    },
     messageView: {
-        height: "10%",
+        width: "60%",
     },
     messageText: {
         ...textDefault,
