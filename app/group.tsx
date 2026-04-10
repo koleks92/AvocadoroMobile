@@ -7,6 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
 import { useAvocadoro } from "@/store/AvocadoroContext";
+import { convertTime } from "@/util/extra";
 import { cancelTransfer, finishTransfer, startTransfer } from "@/util/startFinishTransfer";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -86,17 +87,6 @@ export default function Group() {
         opacity: rootOpacity.value,
     }));
 
-    function convertTime(): void {
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-
-        // Pad with leading zeros if needed
-        const paddedHours = String(hours).padStart(2, "0");
-        const paddedMinutes = String(minutes).padStart(2, "0");
-
-        setTotalTime(`${paddedHours}h ${paddedMinutes}m`);
-    }
-
     useEffect(() => {
         if (modalVisible) {
             rootOpacity.value = 0.5;
@@ -144,7 +134,7 @@ export default function Group() {
 
     useEffect(() => {
         setAvocadoroAmount(Math.floor(totalMinutes / focusTimer));
-        convertTime();
+        setTotalTime(convertTime(totalMinutes))
     }, [totalMinutes]);
 
     // Transfer function
