@@ -5,13 +5,8 @@ import InputField from "@/components/UI/Input";
 import ShakingLogo from "@/components/UI/ShakingLogo";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import { useAuth } from "@/hooks/useAuth";
 import { useAvocadoro } from "@/store/AvocadoroContext";
-import {
-    signInAppleHandler,
-    signInGoogleHandler,
-    signInHandler,
-    signUpHandler,
-} from "@/util/auth";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { JwtPayload } from "@supabase/supabase-js";
@@ -45,6 +40,14 @@ export default function Index() {
     const [authLoaded, setAuthLoaded] = useState(false);
 
     const [claims, setClaims] = useState<JwtPayload | null>(null);
+
+    // Auth hook
+    const {
+        signUpHandler,
+        signInHandler,
+        signInGoogleHandler,
+        signInAppleHandler,
+    } = useAuth(email, password, passwordConfirm, supabase, setMessage);
 
     useEffect(() => {
         // Clean up message
@@ -143,13 +146,7 @@ export default function Index() {
                                     <Button
                                         title="Sign Up"
                                         onPress={() => {
-                                            signUpHandler(
-                                                email,
-                                                password,
-                                                passwordConfirm,
-                                                supabase,
-                                                setMessage,
-                                            );
+                                            signUpHandler();
                                         }}
                                         accessibilityLabel="signup-button"
                                     />
@@ -159,12 +156,7 @@ export default function Index() {
                                     <Button
                                         title="Sign In"
                                         onPress={() => {
-                                            signInHandler(
-                                                email,
-                                                password,
-                                                supabase,
-                                                setMessage,
-                                            );
+                                            signInHandler();
                                         }}
                                         accessibilityLabel="signin-button"
                                     />
@@ -178,10 +170,7 @@ export default function Index() {
                                             }
                                             accessibilityLabel="google-button"
                                             onPress={() =>
-                                                signInGoogleHandler(
-                                                    supabase,
-                                                    setMessage,
-                                                )
+                                                signInGoogleHandler()
                                             }
                                             icon={true}
                                         />
@@ -194,10 +183,7 @@ export default function Index() {
                                                     />
                                                 }
                                                 onPress={() =>
-                                                    signInAppleHandler(
-                                                        supabase,
-                                                        setMessage,
-                                                    )
+                                                    signInAppleHandler()
                                                 }
                                                 icon={true}
                                             />
