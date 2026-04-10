@@ -5,6 +5,7 @@ import GoBackButton from "@/components/UI/GoBackButton";
 import InputField from "@/components/UI/Input";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import { useAddGroup } from "@/hooks/useAddGroup";
 import { useAvocadoro } from "@/store/AvocadoroContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -18,8 +19,6 @@ import {
 } from "react-native";
 
 export default function AddGroup() {
-    const router = useRouter();
-
     // Read values from the route
     const { groupId, groupName, groupFocusTimer, groupBreakTimer, anonymous } =
         useLocalSearchParams();
@@ -39,6 +38,9 @@ export default function AddGroup() {
 
     const [name, setName] = useState<string>("");
 
+    const router = useRouter();
+
+    // Set initial states
     useEffect(() => {
         if (!groupId) return;
 
@@ -52,6 +54,7 @@ export default function AddGroup() {
         }
     }, [groupId]);
 
+    // Check if anonymouse mode
     useEffect(() => {
         if (anonymous === "true") {
             setAnonymousMode(true);
@@ -68,110 +71,19 @@ export default function AddGroup() {
         }
     }, [focusTimer, breakTimer]);
 
-    // Add/Edit new session group
-    async function saveGroupHandler(): Promise<void> {
-        setMessage("");
-
-        // Check if name provided
-        if (!name || name.trim() === "") {
-            setMessage("Missing avocadoro name");
-            return;
-        }
-
-        // Double check if logged in correctly
-        if (!session?.user.id) {
-            setMessage("Something went wrong,\n please try again!");
-            return;
-        }
-
-        // Check if already in database
-        const { data: existingGroup, error: fetchError } = await supabase
-            .from("session_groups")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .eq("name", name.trim())
-            .maybeSingle();
-
-        if (fetchError) {
-            console.error("Error checking for existing group:", fetchError);
-            return;
-        }
-
-        if (existingGroup && existingGroup.id !== id) {
-            setMessage("You already have a group\n with that name.");
-            return;
-        }
-
-        if (editMode) {
-            // Edit session group
-            const { data, error } = await supabase
-                .from("session_groups")
-                .update({
-                    name: name.trim(),
-                    focus_timer: focusTimer,
-                    break_timer: breakTimer,
-                })
-                .eq("id", id)
-                .select();
-
-            if (data) {
-                router.navigate("/dashboard");
-            }
-
-            if (error) {
-                setMessage(error.message);
-            }
-        } else {
-            // Insert new data (new session group)
-            const { data, error } = await supabase
-                .from("session_groups")
-                .insert({
-                    user_id: session.user.id,
-                    name: name.trim(),
-                    focus_timer: focusTimer,
-                    break_timer: breakTimer,
-                })
-                .select();
-
-            if (data) {
-                router.navigate("/dashboard");
-            }
-
-            if (error) {
-                setMessage(error.message);
-            }
-        }
-    }
-
-    // Delete group session
-    async function deleteGroupHandler(): Promise<void> {
-        const { data, error } = await supabase
-            .from("session_groups")
-            .delete()
-            .eq("id", id)
-            .select();
-
-        if (error) {
-            setMessage(error.message);
-        }
-
-        if (data) {
-            router.navigate("/dashboard");
-        }
-    }
-
-    // Create anonymous session
-    function createAnonymousGroup(): void {
-        router.navigate({
-            pathname: "/group",
-            params: {
-                name: "",
-                focusTimer: focusTimer,
-                breakTimer: breakTimer,
-                anonymous: "true",
-            },
-        });
-    }
+    // useAddGroup hook
+    const { saveGroupHandler, deleteGroupHandler, createAnonymousGroup } =
+        useAddGroup(
+            supabase,
+            session,
+            id,
+            name,
+            focusTimer,
+            breakTimer,
+            editMode,
+            setMessage,
+            router
+        );
 
     if (loading) {
         return;
