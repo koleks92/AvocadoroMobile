@@ -9,7 +9,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState, Vibration } from "react-native";
 
-interface TimerOptions {
+type TimerOptions = {
     focusTimer: number;
     breakTimer: number;
     onComplete: (minutes: number, finishTime: number) => void;

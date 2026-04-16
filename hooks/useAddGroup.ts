@@ -1,17 +1,25 @@
-import { Session, SupabaseClient } from "@supabase/supabase-js";
+import { useAvocadoro } from "@/store/AvocadoroContext";
 import { Router } from "expo-router";
 
-export function useAddGroup(
-    supabase: SupabaseClient,
-    session: Session | null,
-    id: string,
-    name: string,
-    focusTimer: number,
-    breakTimer: number,
-    editMode: boolean,
-    setMessage: React.Dispatch<React.SetStateAction<string>>,
-    router: Router,
-) {
+type AddGroupOptions = {
+    id: string;
+    name: string;
+    focusTimer: number;
+    breakTimer: number;
+    editMode: boolean;
+    router: Router;
+}
+
+export function useAddGroup({
+    id,
+    name,
+    focusTimer,
+    breakTimer,
+    editMode,
+    router,
+}: AddGroupOptions) {
+    // Context
+    const {supabase, session, setMessage } = useAvocadoro();
     // Add/Edit new session group
     const saveGroupHandler = async (): Promise<void> => {
         setMessage("");

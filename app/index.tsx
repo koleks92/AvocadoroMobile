@@ -29,7 +29,7 @@ const iosClientId: string = process.env.EXPO_PUBLIC_IOSCLIENT_ID!;
 export default function Index() {
     const router = useRouter();
 
-    const { session, supabase, setSession, message, setMessage } =
+    const { session, supabase, message, setMessage } =
         useAvocadoro();
 
     const [email, setEmail] = useState<string>("");
@@ -47,7 +47,7 @@ export default function Index() {
         signInHandler,
         signInGoogleHandler,
         signInAppleHandler,
-    } = useAuth(email, password, passwordConfirm, supabase, setMessage);
+    } = useAuth({ email, password, passwordConfirm });
 
     useEffect(() => {
         // Clean up message

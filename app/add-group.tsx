@@ -73,17 +73,7 @@ export default function AddGroup() {
 
     // useAddGroup hook
     const { saveGroupHandler, deleteGroupHandler, createAnonymousGroup } =
-        useAddGroup(
-            supabase,
-            session,
-            id,
-            name,
-            focusTimer,
-            breakTimer,
-            editMode,
-            setMessage,
-            router
-        );
+        useAddGroup({ id, name, focusTimer, breakTimer, editMode, router });
 
     if (loading) {
         return;
