@@ -6,13 +6,12 @@ import GoBackButton from "@/components/UI/GoBackButton";
 import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { rootStyles, textDefault } from "@/constants/Styles";
+import { useGroup } from "@/hooks/useGroup";
 import { useAvocadoro } from "@/store/AvocadoroContext";
-import { convertTime } from "@/util/extra";
-import { cancelTransfer, finishTransfer, startTransfer } from "@/util/startFinishTransfer";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { Modal, StyleSheet, Text, View } from "react-native";
 import Animated, {
     Easing,
@@ -38,48 +37,26 @@ export default function Group() {
     const { supabase, timerOn, message, setMessage, timerMode } =
         useAvocadoro();
 
-    // Modal
-    const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [transferStatus, setTransferStatus] =
-        useState<TransferTypes>("Recive");
-    const [transferStatusText, setTransferStatusText] = useState<string>("");
-
-    // Messages
-    const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // Read the values from the route
-    const params = useLocalSearchParams<SessionGroupProps>();
-
-    // States from the route
-    const [name, setName] = useState<string>(params.name || "");
-    const [focusTimer, setFocusTimer] = useState<number>(
-        Number(params.focusTimer) || 25,
-    );
-    const [breakTimer, setBreakTimer] = useState<number>(
-        Number(params.breakTimer) || 5,
-    );
-    const [totalMinutes, setTotalMinutes] = useState<number>(
-        Number(params.totalMinutes) || 0,
-    );
-    const [id, setId] = useState<string>(params.id || "");
-
-    // Timer state from supabase
-    const [supabaseFinishTime, setSupabaseFinishTime] = useState<string>("");
-
-    // Timer state
-    const [totalSeconds, setTotalSeconds] = useState<number>(0);
-
-    // Print states
-    const [avocadoroAmount, setAvocadoroAmount] = useState<number>(0);
-    const [totalTime, setTotalTime] = useState<string>("");
-
-    const [anonymousMode, setAnonymousMode] = useState<boolean>(false);
-
-    // Supabase realtime database chanell
-    const transferChannelRef = useRef<any>(null);
-
-    // Transfer status
-    const [transferRecived, setTransferRecived] = useState<boolean>(false);
+    const {
+        id,
+        name,
+        focusTimer,
+        breakTimer,
+        anonymousMode,
+        totalSeconds,
+        setTotalSeconds,
+        supabaseFinishTime,
+        transferRecived,
+        avocadoroAmount,
+        totalTime,
+        modalVisible,
+        setModalVisible,
+        transferStatus,
+        transferStatusText,
+        transferTimer,
+        onCompleteHandler,
+        messageTimer,
+    } = useGroup();
 
     // Root animated style
     const rootOpacity = useSharedValue(1);
@@ -93,115 +70,7 @@ export default function Group() {
         } else {
             rootOpacity.value = 1;
         }
-
-        if (!timerOn) {
-            setTransferStatus("Recive");
-            setTransferStatusText("Ready to recive timer!");
-        }
-
-        if (timerOn) {
-            setTransferStatus("Send");
-            setTransferStatusText("Ready to send timer!");
-        }
     }, [modalVisible]);
-
-    useEffect(() => {
-        if (params.anonymous === "true") {
-            setAnonymousMode(true);
-        }
-    }, [params]);
-
-    // Cleanup message timer
-    useEffect(() => {
-        const checkTimer = async (): Promise<void> => {
-            const { data, error } = await supabase
-                .from("session_groups")
-                .select("timer_on, finish_time")
-                .eq("id", id)
-                .single();
-
-            if (data?.timer_on) {
-                setModalVisible(true);
-            }
-        };
-
-        checkTimer();
-
-        return () => {
-            if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
-        };
-    }, []);
-
-    useEffect(() => {
-        setAvocadoroAmount(Math.floor(totalMinutes / focusTimer));
-        setTotalTime(convertTime(totalMinutes))
-    }, [totalMinutes]);
-
-    // Transfer function
-    const transferTimer = async (): Promise<void> => {
-        if (transferStatus === "Recive") {
-            const { data, error } = await supabase
-                .from("session_groups")
-                .select("timer_on, finish_time")
-                .eq("id", id)
-                .single();
-
-            if (data?.timer_on) {
-                setSupabaseFinishTime(data.finish_time);
-                finishTransfer(supabase, id);
-                setModalVisible(false);
-            } else {
-                setTransferStatusText("Transfer failed!\nTry again!");
-            }
-        }
-
-        if (transferStatus === "Send") {
-            if (timerMode === "focus") {
-                startTransfer(supabase, totalSeconds, id);
-                setTransferStatusText("Sending...");
-
-                // Start listening
-                transferChannelRef.current = supabase
-                    .channel("transfer-channel")
-                    .on(
-                        "postgres_changes",
-                        {
-                            event: "UPDATE",
-                            schema: "public",
-                            table: "session_groups",
-                            filter: `id=eq.${id}`,
-                        },
-                        (payload) => {
-                            if (payload.new.transfer_status === "recived") {
-                                setModalVisible(false);
-                                stopListening();
-                                setTransferRecived(true);
-                                setTimeout(() => {
-                                    setTransferRecived(false);
-                                }, 5000);
-                            }
-                        },
-                    )
-                    .subscribe();
-
-                // Stop after 30 seconds
-                setTimeout(() => {
-                    stopListening();
-                    cancelTransfer(supabase, id);
-                    setTransferStatusText("Transfer failed!\nTry again!");
-                }, 30000);
-            } else {
-                setTransferStatusText("Cannot transfer break!")
-            }
-        }
-    };
-
-    const stopListening = () => {
-        if (transferChannelRef.current) {
-            supabase.removeChannel(transferChannelRef.current);
-            transferChannelRef.current = null;
-        }
-    };
 
     // Shared values — translate instead of height
     const timerTranslateY = useSharedValue(0);
@@ -239,55 +108,6 @@ export default function Group() {
 
         timerOpacity.value = withTiming(1, OpacityTiming);
         timerTranslateY.value = withTiming(0, TranslateTiming); // slide up into view
-    };
-
-    const onCompleteHandler = async (
-        minutes: number,
-        finishTime: number,
-    ): Promise<void> => {
-        setMessage("");
-
-        // TEST MODE
-        if (minutes === 0.1) {
-            console.log("Test");
-            setAvocadoroAmount((prev) => prev + 1);
-            setTotalMinutes((prev) => prev + focusTimer);
-            return;
-        }
-
-        // Insert data
-        if (!anonymousMode) {
-            const { data, error } = await supabase
-                .from("sessions")
-                .insert({
-                    session_group_id: id,
-                    duration_minutes: minutes,
-                    finish_time: new Date(finishTime).toISOString(),
-                })
-                .select();
-
-            if (error) {
-                // setMessage(error.message);
-                setMessage(
-                    "Cannot save data.\n Are you running a timer on another device ?",
-                );
-                setTimeout(() => {
-                    setMessage("");
-                }, 15000);
-            }
-        }
-
-        setAvocadoroAmount((prev) => prev + 1);
-        setTotalMinutes((prev) => prev + focusTimer);
-    };
-
-    const messageTimer = (): void => {
-        if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
-        messageTimerRef.current = setTimeout(() => {
-            setMessage("");
-        }, 5000);
-        setMessage("Reset the timer first!");
-        return;
     };
 
     return (
