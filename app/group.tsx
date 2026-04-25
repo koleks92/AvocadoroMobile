@@ -20,17 +20,6 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 
-type SessionGroupProps = {
-    id: string;
-    name: string;
-    focusTimer: string;
-    breakTimer: string;
-    totalMinutes: string;
-    anonymous: string;
-};
-
-type TransferTypes = "Recive" | "Send";
-
 export default function Group() {
     const router = useRouter();
 
@@ -299,26 +288,30 @@ export default function Group() {
                                 }
                                 transferRecived={transferRecived}
                             />
-                            <View style={styles.bottomView}>
-                                <View style={styles.bottomButtonView}>
-                                    <Button
-                                        title={
-                                            <MaterialIcons
-                                                name="transfer-within-a-station"
-                                                size={Sizes.buttonIcon}
-                                            />
-                                        }
-                                        icon={true}
-                                        onPress={() => setModalVisible(true)}
-                                        accessibilityLabel="down-button"
-                                    />
+                            {!anonymousMode && (
+                                <View style={styles.bottomView}>
+                                    <View style={styles.bottomButtonView}>
+                                        <Button
+                                            title={
+                                                <MaterialIcons
+                                                    name="transfer-within-a-station"
+                                                    size={Sizes.buttonIcon}
+                                                />
+                                            }
+                                            icon={true}
+                                            onPress={() =>
+                                                setModalVisible(true)
+                                            }
+                                            accessibilityLabel="down-button"
+                                        />
+                                    </View>
+                                    <View style={styles.messageView}>
+                                        <Text style={styles.messageText}>
+                                            {message}
+                                        </Text>
+                                    </View>
                                 </View>
-                                <View style={styles.messageView}>
-                                    <Text style={styles.messageText}>
-                                        {message}
-                                    </Text>
-                                </View>
-                            </View>
+                            )}
                         </View>
                     </Animated.View>
                 </View>
