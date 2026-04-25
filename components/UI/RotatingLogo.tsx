@@ -10,6 +10,7 @@ import Animated, {
 export default memo(function RotatingLogo() {
     const rotate = useSharedValue(0);
 
+    // Animation of press
     const handlePress = () => {
         const duration = 100; // Total animation ~500ms (10 steps × 50ms)
 
@@ -28,6 +29,7 @@ export default memo(function RotatingLogo() {
         );
     };
 
+    // Animated styles
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: `${rotate.value}deg` }],
     }));

@@ -23,9 +23,9 @@ import Animated, {
 export default function Group() {
     const router = useRouter();
 
-    const { supabase, timerOn, message, setMessage, timerMode } =
-        useAvocadoro();
+    const { timerOn, message } = useAvocadoro();
 
+    // useGroup Hook
     const {
         id,
         name,
@@ -47,6 +47,8 @@ export default function Group() {
         messageTimer,
     } = useGroup();
 
+    // ANIMATIONS
+
     // Root animated style
     const rootOpacity = useSharedValue(1);
     const rootAnimatedStyle = useAnimatedStyle(() => ({
@@ -67,6 +69,7 @@ export default function Group() {
     const avocadoroTranslateY = useSharedValue(1000); // starts offscreen below
     const avocadoroOpacity = useSharedValue(0);
 
+    // Animation styles
     const timerAnimatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: timerTranslateY.value }],
         opacity: timerOpacity.value,
@@ -77,12 +80,14 @@ export default function Group() {
         opacity: avocadoroOpacity.value,
     }));
 
+    // Animation timings
     const OpacityTiming = { duration: 500, easing: Easing.inOut(Easing.ease) };
     const TranslateTiming = {
         duration: 1000,
         easing: Easing.inOut(Easing.ease),
     };
 
+    // Close timer, open avocadoro card styles
     const closeTimerOpenAvocadoro = () => {
         timerOpacity.value = withTiming(0, OpacityTiming);
         timerTranslateY.value = withTiming(1000, TranslateTiming); // slide down out

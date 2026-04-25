@@ -41,6 +41,7 @@ export default function Timer({
         onTotalSecondsChange,
     });
 
+    // Reset timer if transfer recived
     useEffect(() => {
         if (transferRecived) reset();
     }, [transferRecived]);

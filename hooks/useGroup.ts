@@ -40,6 +40,7 @@ export function useGroup() {
     const messageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const transferChannelRef = useRef<any>(null);
 
+    // Set status on modal visible
     useEffect(() => {
         if (!timerOn) {
             setTransferStatus("Recive");
@@ -50,6 +51,7 @@ export function useGroup() {
         }
     }, [modalVisible]);
 
+    // Open modal if availivle timer to recive
     useEffect(() => {
         const checkTimer = async () => {
             const { data } = await supabase
@@ -67,11 +69,14 @@ export function useGroup() {
         };
     }, []);
 
+    // Set total time
     useEffect(() => {
         setAvocadoroAmount(Math.floor(totalMinutes / focusTimer));
         setTotalTime(convertTime(totalMinutes));
     }, [totalMinutes]);
 
+
+    // Stop listening for real time database
     const stopListening = () => {
         if (transferChannelRef.current) {
             supabase.removeChannel(transferChannelRef.current);
@@ -79,6 +84,7 @@ export function useGroup() {
         }
     };
 
+    // Transfer timer function
     const transferTimer = async () => {
         if (transferStatus === "Recive") {
             const { data } = await supabase
@@ -130,6 +136,7 @@ export function useGroup() {
         }
     };
 
+    // onComplete function
     const onCompleteHandler = async (minutes: number, finishTime: number) => {
         setMessage("");
 
@@ -159,6 +166,7 @@ export function useGroup() {
         setTotalMinutes((prev) => prev + focusTimer);
     };
 
+    // Messege state
     const messageTimer = () => {
         if (messageTimerRef.current) clearTimeout(messageTimerRef.current);
         messageTimerRef.current = setTimeout(() => setMessage(""), 5000);

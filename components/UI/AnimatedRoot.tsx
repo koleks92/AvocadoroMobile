@@ -12,6 +12,7 @@ import Animated, {
 export default function AnimatedRoot() {
     const opacityRef = useSharedValue(1);
 
+    // If screen if focused
     useFocusEffect(
         useCallback(() => {
             opacityRef.value = withSequence(

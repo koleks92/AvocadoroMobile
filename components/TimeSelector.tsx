@@ -28,6 +28,7 @@ export default function TimeSelector({
     for (let i: number = min; i <= max; i += step) {
         times.push(i);
     }
+    
     return (
         <View style={styles.root}>
             {times.map((time) => {

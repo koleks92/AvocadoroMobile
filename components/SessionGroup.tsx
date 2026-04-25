@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { Sizes } from "@/constants/Sizes";
 import { textDefault } from "@/constants/Styles";
+import { convertTime } from "@/util/extra";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,7 +14,7 @@ type SessionGroupProps = {
     breakTimer?: number;
     totalMinutes?: number;
     addNew?: boolean;
-}
+};
 
 export default function SessionGroup({
     id,
@@ -26,21 +27,11 @@ export default function SessionGroup({
     const [time, setTime] = useState<string>("0:00h");
     const router = useRouter();
 
+    // Conver time
     useEffect(() => {
-        function convertTime(): void {
-            if (totalMinutes) {
-                const hours = Math.floor(totalMinutes / 60);
-                const minutes = totalMinutes % 60;
-
-                // Pad with leading zeros if needed
-                const paddedHours = String(hours).padStart(2, "0");
-                const paddedMinutes = String(minutes).padStart(2, "0");
-
-                setTime(`${paddedHours}:${paddedMinutes}h`);
-            }
+        if (totalMinutes) {
+            setTime(convertTime(totalMinutes));
         }
-
-        convertTime();
     }, []);
 
     return (
@@ -116,7 +107,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primaryDarkGreen,
     },
     titleView: { justifyContent: "center", alignItems: "center" },
-    titleText: { ...textDefault, fontSize: Sizes.sgTitle, textAlign: 'center' },
+    titleText: { ...textDefault, fontSize: Sizes.sgTitle, textAlign: "center" },
     addView: {
         flex: 1,
         justifyContent: "center",

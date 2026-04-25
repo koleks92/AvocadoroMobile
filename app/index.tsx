@@ -49,6 +49,7 @@ export default function Index() {
         signInAppleHandler,
     } = useAuth({ email, password, passwordConfirm });
 
+    // Initial load useEffect
     useEffect(() => {
         // Clean up message
         setMessage("");
@@ -78,6 +79,7 @@ export default function Index() {
         return () => listener.subscription.unsubscribe();
     }, []);
 
+    // Check if logged in
     useEffect(() => {
         if (session) {
             router.navigate("/dashboard");

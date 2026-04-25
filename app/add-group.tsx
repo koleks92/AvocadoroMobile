@@ -23,7 +23,7 @@ export default function AddGroup() {
     const { groupId, groupName, groupFocusTimer, groupBreakTimer, anonymous } =
         useLocalSearchParams();
 
-    const { session, supabase, message, setMessage } = useAvocadoro();
+    const { message } = useAvocadoro();
 
     const [buttonWidth, setButtonWidth] = useState<number>(0);
 

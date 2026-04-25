@@ -17,6 +17,7 @@ type AuthOptions = {
 export function useAuth({ email, password, passwordConfirm }: AuthOptions) {
     const { supabase, setMessage } = useAvocadoro();
 
+    // Sign Up Function
     const signUpHandler = async (): Promise<void> => {
         setMessage("");
         Keyboard.dismiss();
@@ -61,6 +62,7 @@ export function useAuth({ email, password, passwordConfirm }: AuthOptions) {
         }
     };
 
+    // Sign in function
     const signInHandler = async (): Promise<void> => {
         setMessage("");
         Keyboard.dismiss();
@@ -102,6 +104,7 @@ export function useAuth({ email, password, passwordConfirm }: AuthOptions) {
         }
     };
 
+    // Google sign in function
     const signInGoogleHandler = async (): Promise<void> => {
         try {
             await GoogleSignin.hasPlayServices();
@@ -132,6 +135,7 @@ export function useAuth({ email, password, passwordConfirm }: AuthOptions) {
         }
     };
 
+    // Apple sign in function
     const signInAppleHandler = async (): Promise<void> => {
         try {
             const response = await AppleAuthentication.signInAsync({

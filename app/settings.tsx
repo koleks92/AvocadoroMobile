@@ -18,6 +18,7 @@ export default function Settings() {
 
     const { supabase } = useAvocadoro();
 
+    // Delete account function
     async function deleteAccountHandler(): Promise<void> {
         await deleteAccount(supabase);
         router.navigate("/");

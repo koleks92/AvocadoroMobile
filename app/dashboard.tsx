@@ -67,6 +67,7 @@ export default function Dashboard() {
         }, [session, loadGroups]),
     );
 
+    // Sign out function
     async function signOut(): Promise<void> {
         const { error } = await supabase.auth.signOut();
     }
